@@ -1,0 +1,14 @@
+%% Application configuration for rebar3 compilation
+{application, extlib_decimal,
+              [{description,     "Erlang Library for Arbitrary Precision Decimals"},
+               {vsn,             "0.1.0"},
+               {registered,      []},
+               {applications,    [kernel,
+                                  stdlib
+                                 ]},
+               {env,             []},
+               {modules,         []},
+
+               {licenses,        ["Apache 2.0"]},
+               {links,           []}
+ ]}.
