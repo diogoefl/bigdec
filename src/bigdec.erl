@@ -50,7 +50,7 @@
 -export([]).
 
 %% Analysis
--export([]).
+-export([exponent_val/1, unscaled_val/1, sign_val/1, precision_val/1]).
 
 %% Constants
 -export([one/0, zero/0, ten/0]).
@@ -138,12 +138,17 @@
 %%=============================================================================
 
 %%-----------------------------------------------------------------------------
-%% @doc Negate bigdecimal changing its value to -value.
+%% @doc Negate bigdecimal changing its sign from 0 to 1 or vice-versa.
+%%
+%% If sign defined in bigdec is invalid (different from 0 or 1), we return a
+%% correction bigdec defining sign as 0 (positive of zero).
 %% @end
 %%----------------------------------------------------------------------------
 -spec neg(#bigdec{}) -> #bigdec{}.
-neg(Num = #bigdec{value = Value}) ->
-  Num#bigdec{value = -1 * Value}.
+neg(Num = #bigdec{value = 0}) -> Num;
+neg(Num = #bigdec{sign = 0})  -> Num#bigdec{sign = 1};
+neg(Num = #bigdec{sign = 1})  -> Num#bigdec{sign = 0};
+neg(Num = #bigdec{sign = _})  -> Num#bigdec{sign = 0}.
 
 
 %%=============================================================================
@@ -157,20 +162,64 @@ neg(Num = #bigdec{value = Value}) ->
 %% is_greater(#bigdec{}, #bigdec{}) -> true | false
 %% is_equal(#bigdec{}, #bigdec{}) -> true | false
 %% is_smaller(#bigdec{}, #bigdec{}) -> true | false
+%% is_zero(#bigdec{}) -> true | false
+%% is_one(#bigdec{}) -> true | false
+%% is_ten(#bigdec{}) -> true | false
 %%
 %%=============================================================================
 
 %%=============================================================================
 %% Library public functions - Analysis
-%%
-%% Planned functions to be implemented
-%% => Analysis
-%% exponent_val(#bigdec{}) -> integer()
-%% unscaled_val(#bigdec{}) -> integer()
-%% precision_val(#bigdec{}) -> integer()
-%% sign_val(#bigdec{}) -> integer()
-%%
 %%=============================================================================
+
+%%-----------------------------------------------------------------------------
+%% @doc Value of exponent in bigdec number.
+%%
+%% The exponent is the component N on the number representation of V * 10 ^ -N.
+%% Exponent value in bigdec is neg against the representation, meaning that for
+%% example 0.2 is represented as (2 * 10 ^ -1) and the exponent value is +1.
+%% @end
+%%----------------------------------------------------------------------------
+-spec exponent_val(#bigdec{}) -> integer().
+exponent_val(#bigdec{exp = Value}) -> Value.
+
+%%-----------------------------------------------------------------------------
+%% @doc Value of unscaled integer representation not applying exponent power.
+%%
+%% The unscaled value represents the number that multiplied by power of exp by
+%% 10 represents the real value of bigdec. The unscaled value is not stripped
+%% of trailing zeros.
+%% @end
+%%----------------------------------------------------------------------------
+-spec unscaled_val(#bigdec{}) -> non_neg_integer().
+unscaled_val(#bigdec{value = Value}) -> Value.
+
+%%-----------------------------------------------------------------------------
+%% @doc Atom defining sign for bigdec.
+%%
+%% The sign used in bigdec structures use 0 for postive or zero numbers, and 1
+%% for negative numbers. This functions returns atom positive if sign is 0 and
+%% atom negative if sign is 1. If bigdec gets incorrect data and sign is not 0
+%% or 1, than atom invalid is returned.
+%% @end
+%%----------------------------------------------------------------------------
+-spec sign_val(#bigdec{}) -> positive | negative | invalid.
+sign_val(#bigdec{sign = 0}) -> positive;
+sign_val(#bigdec{sign = 1}) -> negative;
+sign_val(#bigdec{sign = _}) -> invalid.
+
+%%-----------------------------------------------------------------------------
+%% @doc Amount of digits of the unscaled valued for the bigdec, also known as
+%% precision of bigdec.
+%%
+%% Calculates the amount of digits found in the representation of the unscaled
+%% value for the bigdec. This amount is not stripped of trailing zeros.
+%% @end
+%%----------------------------------------------------------------------------
+-spec precision_val(#bigdec{}) -> non_neg_integer().
+precision_val(#bigdec{value = Value}) ->
+  StringVal = integer_to_list(Value),
+  string:length(StringVal).
 
 %%=============================================================================
 %% Library public functions - Constants
@@ -344,6 +393,40 @@ hlp_pow(Num, Exp, Acc)                     -> hlp_pow(Num*Num, (Exp-1) div 2, Nu
 %%=============================================================================
 
 -ifdef(TEST).
+
+neg_test() ->
+  ?assertEqual(    #bigdec{sign = 0, value = 120394823, exp = 450},
+               neg(#bigdec{sign = 1, value = 120394823, exp = 450})),
+  ?assertEqual(    #bigdec{sign = 1, value = 35, exp = 10},
+               neg(#bigdec{sign = 0, value = 35, exp = 10})),
+  ?assertEqual(    #bigdec{sign =    0, value = 1, exp = 4},
+               neg(#bigdec{sign = '-1', value = 1, exp = 4})).
+
+exponent_val_test() ->
+  ?assertEqual(10,  exponent_val(#bigdec{sign = 0, value = 0, exp =  10})),
+  ?assertEqual(302, exponent_val(#bigdec{sign = 0, value = 0, exp = 302})).
+
+unscaled_val_test() ->
+  ?assertEqual(9233498374981274897489178971489374,
+               unscaled_val(#bigdec{sign = 0,
+                                    value = 9233498374981274897489178971489374,
+                                    exp = 10})),
+  ?assertEqual(9230000000000000000000000000000000,
+               unscaled_val(#bigdec{sign = 0,
+                                    value = 9230000000000000000000000000000000,
+                                    exp = 10})).
+
+sign_val_test() ->
+  ?assertEqual(positive, sign_val(#bigdec{sign =  0, value = 0, exp = 0})),
+  ?assertEqual(positive, sign_val(#bigdec{sign =  0, value = 1, exp = 0})),
+  ?assertEqual(negative, sign_val(#bigdec{sign =  1, value = 1, exp = 0})),
+  ?assertEqual(invalid,  sign_val(#bigdec{sign = -1, value = 1, exp = 0})),
+  ?assertEqual(invalid,  sign_val(#bigdec{sign = '0', value = 0, exp = 0})).
+
+precision_val_test() ->
+  ?assertEqual(10, precision_val(#bigdec{sign = 0, value = 1483495837, exp = 5})),
+  ?assertEqual( 3, precision_val(#bigdec{sign = 0, value =        222, exp = 5})),
+  ?assertEqual( 1, precision_val(#bigdec{sign = 0, value =          0, exp = 0})).
 
 float_to_bitstring_test() ->
   ?assertEqual(<<"2.20000000000000">>, float_to_bitstring(2.2)),
