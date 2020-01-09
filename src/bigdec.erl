@@ -36,6 +36,14 @@
 -include("bigdec.hrl").
 
 %%=============================================================================
+%% EUnit setup
+%%=============================================================================
+
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+-endif.
+
+%%=============================================================================
 %% Library public API
 %%=============================================================================
 
@@ -128,9 +136,8 @@ bitstring_to_bigdec(Value) ->
 %%      | {false,             0}.
 %% @end
 %%-----------------------------------------------------------------------------
-
 -spec has_trailing_zeros(#bigdec{}) -> {true, integer()}
-| {false,        0}.
+                                     | {false,        0}.
 has_trailing_zeros(#bigdec{value = Value}) ->
   Amount = has_trailing_zeros(Value, 0),
   case Amount of
@@ -139,7 +146,8 @@ has_trailing_zeros(#bigdec{value = Value}) ->
   end.
 
 -spec has_trailing_zeros(integer(), integer()) -> integer().
-has_trailing_zeros(Value, Amount) when is_integer(Value), is_integer(Amount) ->
+has_trailing_zeros(Value, Amount) when is_integer(Value),
+                                       is_integer(Amount) ->
   case Value rem (pow(10, Amount + 1)) == 0 of
     true  -> has_trailing_zeros(Value, Amount + 1);
     false -> Amount
@@ -158,11 +166,10 @@ has_trailing_zeros(Value, Amount) when is_integer(Value), is_integer(Amount) ->
 %% these cases it returns error.
 %% @end
 %%-----------------------------------------------------------------------------
-
 -spec pow(integer(), non_neg_integer()) -> integer().
 pow(Number, Exponent) when is_integer(Number),
-  is_integer(Exponent),
-  Exponent >= 0         ->
+                           is_integer(Exponent),
+                           Exponent >= 0         ->
   pow(Number, Exponent, 1).
 
 -spec pow(integer(), non_neg_integer(), integer()) -> integer().
@@ -170,3 +177,12 @@ pow(  _,   0, Acc)                     -> Acc;
 pow(Num,   1, Acc)                     -> Acc*Num;
 pow(Num, Exp, Acc) when Exp rem 2 == 0 -> pow(Num*Num, Exp div 2,     Acc);
 pow(Num, Exp, Acc)                     -> pow(Num*Num, (Exp-1) div 2, Num*Acc).
+
+
+%%=============================================================================
+%% EUnit Tests
+%%=============================================================================
+
+-ifdef(TEST).
+
+-endif.
