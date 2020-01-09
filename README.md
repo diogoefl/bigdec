@@ -1,4 +1,4 @@
-extlib_decimal
+bigdec
 =====
 
 An OTP library for arbitrary precision decimals

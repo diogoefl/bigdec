@@ -1,5 +1,5 @@
 %% Application configuration for rebar3 compilation
-{application, extlib_decimal,
+{application, bigdec,
               [{description,     "Erlang Library for Arbitrary Precision Decimals"},
                {vsn,             "0.1.0"},
                {registered,      []},

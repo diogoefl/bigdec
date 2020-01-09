@@ -21,6 +21,7 @@ deps
 _build/
 _checkouts/
 rebar3.crashdump
+rebar.lock
 
 # Others
 _*
