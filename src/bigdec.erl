@@ -52,15 +52,6 @@
 %% Internal Functions - exports for debugging during development
 %%=============================================================================
 
-%% Conversions
--export([float_to_bitstring/1, float_to_bitstring/2, bitstring_to_bigdec/1]).
-
-%% Analysis
--export([has_trailing_zeros/1]).
-
-%% Utilities
--export([pow/2]).
-
 
 %%=============================================================================
 %% Internal Functions - Conversions
@@ -186,14 +177,14 @@ pow(Num, Exp, Acc)                     -> pow(Num*Num, (Exp-1) div 2, Num*Acc).
 -ifdef(TEST).
 
 has_trailing_zeros_test() ->
-  ?assertEqual({true,  3}, bigdec:has_trailing_zeros(#bigdec{value =       1000})),
-  ?assertEqual({true,  3}, bigdec:has_trailing_zeros(#bigdec{value =      -1000})),
-  ?assertEqual({false, 0}, bigdec:has_trailing_zeros(#bigdec{value = 4392345897})).
+  ?assertEqual({true,  3}, has_trailing_zeros(#bigdec{value =       1000})),
+  ?assertEqual({true,  3}, has_trailing_zeros(#bigdec{value =      -1000})),
+  ?assertEqual({false, 0}, has_trailing_zeros(#bigdec{value = 4392345897})).
 
 pow_test() ->
-  ?assertEqual(25,                              bigdec:pow(-5,   2)),
-  ?assertEqual(4261655511456885005249781170176, bigdec:pow(34,  20)),
-  ?assertError(function_clause,                 bigdec:pow(10, 0.5)),
-  ?assertError(function_clause,                 bigdec:pow(10,  -2)).
+  ?assertEqual(25,                              pow(-5,   2)),
+  ?assertEqual(4261655511456885005249781170176, pow(34,  20)),
+  ?assertError(function_clause,                 pow(10, 0.5)),
+  ?assertError(function_clause,                 pow(10,  -2)).
 
 -endif.
