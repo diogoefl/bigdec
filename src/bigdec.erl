@@ -31,7 +31,29 @@
 %% @end
 %%=============================================================================
 
+%% Library Public API
 -export([]).
+
+%% Conversion to bigdec
+-export([]).
+
+%% Conversion from bigdec
+-export([]).
+
+%% Arithmetic
+-export([]).
+
+%% Transform
+-export([neg/1]).
+
+%% Comparison
+-export([]).
+
+%% Analysis
+-export([]).
+
+%% Constants
+-export([one/0, zero/0, ten/0]).
 
 -include("bigdec.hrl").
 
@@ -47,30 +69,133 @@
 %% Library public API
 %%=============================================================================
 
-%% Planned API for using bigdec module
+
+%%=============================================================================
+%% Library public functions - Conversions to bigdec
 %%
+%% Planned functions to be implemented
 %% => Conversions to bigdec
 %% parse(string | bitstring | float | integer)            -> #bigdec{}
 %% parse(string | bitstring | float | integer, {options}) -> #bigdec{}
+%%=============================================================================
+
+
+%%=============================================================================
+%% Library public functions - Conversions from bigdec
 %%
+%% Planned functions to be implemented
 %% => Conversion from bigdec
 %% as_float(#bigdec{})            -> float
 %% as_float(#bigdec{}, {options}) -> float
 %% as_text(#bigdec{})             -> bitstring
 %% as_text(#bigdec{}, {options})  -> bitstring | string
 %%
-%% => Arithmetic
-%% add(  #bigdec{} | float | integer, #bigdec{} | float | integer)  -> #bigdec{}
-%% minus(#bigdec{} | float | integer, #bigdec{} | float | integer)  -> #bigdec{}
-%% mult( #bigdec{} | float | integer, #bigdec{} | float | integer)  -> #bigdec{}
-%% div(  #bigdec{} | float | integer, #bigdec{} | float | integer)  -> #bigdec{}
-%% pow(  #bigdec{}, integer)                                        -> #bigdec{}
+%%=============================================================================
+
+
+%%=============================================================================
+%% Library public functions - Arithmetic
 %%
+%% Planned functions to be implemented
+%% => Arithmetic
+%% add(  #bigdec{}, #bigdec{})  -> #bigdec{}
+%% minus(#bigdec{}, #bigdec{})  -> #bigdec{}
+%% mult( #bigdec{}, #bigdec{})  -> #bigdec{}
+%% div(  #bigdec{}, #bigdec{})  -> #bigdec{}
+%% pow(  #bigdec{}, integer)    -> #bigdec{}
+%% rem(  #bigdec{}, #bigdec{})  -> #bigdec{}
+%%
+%%=============================================================================
+
 
 %%=============================================================================
-%% Internal Functions - exports for debugging during development
+%% Library public functions - Transform
+%%
+%% Planned functions to be implemented
+%% => Transform
+%% neg(#bigdec{])                                     -> #bigdec{} (DONE)
+%% round(#bigdec{})                                   -> #bigdec{}
+%% round(#bigdec{}, rounding_pattern)                 -> #bigdec{}
+%% change_exp(#bigdec{}, integer())                   -> #bigdec{}
+%% change_exp(#bigdec{}, integer(), rounding_pattern) -> #bigdec{}
+%% strip_zeros(#bigdec{})                             -> #bigdec{}
+%% rescale_by(#bigdec{}, integer())                   -> #bigdec{}
+%% incr_exp(#bigdec{})                                -> #bigdec{}
+%% decr_exp(#bigdec{})                                -> #bigdec{}
+%%
+%% => Rounding Patterns
+%% round_up        => Increments the digit prior to a nonzero discarded fraction
+%% round_down      => Doesn't increment the digit prior to a discarded fraction (trunc)
+%% round_ceiling   => Round towards positive infinity - if sign is positive act as
+%%                    round_up, if is negative act as round_down
+%% round_floor     => Round towards negative infinity - if sign is positive act as
+%%                    round_down, it is negative act as round_up
+%% round_half_up   => If the discarded fraction is >= 0.5, use round_up
+%% round_half_down => If the discarded fraction is >  0.5, use round_up
+%% round_half_even => If remainder digit from discard (left digit to the discarded fraction)
+%%                    is even, act as round_half_up, otherwise use round_half_down
+%%
 %%=============================================================================
 
+%%-----------------------------------------------------------------------------
+%% @doc Negate bigdecimal changing its value to -value.
+%% @end
+%%----------------------------------------------------------------------------
+-spec neg(#bigdec{}) -> #bigdec{}.
+neg(Num = #bigdec{value = Value}) ->
+  Num#bigdec{value = -1 * Value}.
+
+
+%%=============================================================================
+%% Library public functions - Comparison
+%%
+%% Planned functions to be implemented
+%% => Comparisons
+%% max(#bigdec{}, #bigdec{}) -> #bigdec{}
+%% min(#bigdec{}, #bigdec{}) -> #bigdec{}
+%% compare(#bigdec{}, #bigdec{}) -> equal | greater | smaller
+%% is_greater(#bigdec{}, #bigdec{}) -> true | false
+%% is_equal(#bigdec{}, #bigdec{}) -> true | false
+%% is_smaller(#bigdec{}, #bigdec{}) -> true | false
+%%
+%%=============================================================================
+
+%%=============================================================================
+%% Library public functions - Analysis
+%%
+%% Planned functions to be implemented
+%% => Analysis
+%% exponent_val(#bigdec{}) -> integer()
+%% unscaled_val(#bigdec{}) -> integer()
+%% precision_val(#bigdec{}) -> integer()
+%% sign_val(#bigdec{}) -> integer()
+%%
+%%=============================================================================
+
+%%=============================================================================
+%% Library public functions - Constants
+%%=============================================================================
+
+%%-----------------------------------------------------------------------------
+%% @doc Bigdec construct regarding value of one when exponent is 0.
+%% @end
+%%----------------------------------------------------------------------------
+-spec one() -> #bigdec{}.
+one() -> #bigdec{sign = 0, value = 1, exp = 0}.
+
+%%-----------------------------------------------------------------------------
+%% @doc Bigdec construct regarding value of zero when exponent is 0.
+%% @end
+%%----------------------------------------------------------------------------
+-spec zero() -> #bigdec{}.
+zero() -> #bigdec{sign = 0, value = 0, exp = 0}.
+
+%%-----------------------------------------------------------------------------
+%% @doc Bigdec construct regarding value of ten when exponent is 0.
+%% @end
+%%----------------------------------------------------------------------------
+-spec ten() -> #bigdec{}.
+ten() -> #bigdec{sign = 0, value = 10, exp = 0}.
 
 %%=============================================================================
 %% Internal Functions - Conversions
@@ -144,6 +269,11 @@ bitstring_processing(validate, Value) ->
 
 %%=============================================================================
 %% Internal Functions - Analysis
+%%
+%% This section provides utility internal functions to validate scenarios.
+%% Most of the functions starts with a corresponding questioning has_ is_ .
+%% These functions allows modular segmentation from more complex functions and
+%% reuse of common patterns.
 %%=============================================================================
 
 %%-----------------------------------------------------------------------------
@@ -158,23 +288,34 @@ bitstring_processing(validate, Value) ->
 -spec has_trailing_zeros(#bigdec{}) -> {true, integer()}
                                      | {false,        0}.
 has_trailing_zeros(#bigdec{value = Value}) ->
-  Amount = has_trailing_zeros(Value, 0),
+  Amount = howmany_trailing_zeros(Value, 0),
   case Amount of
     0 -> {false,     0};
     _ -> {true, Amount}
   end.
 
--spec has_trailing_zeros(integer(), integer()) -> integer().
-has_trailing_zeros(Value, Amount) when is_integer(Value),
-                                       is_integer(Amount) ->
+%%-----------------------------------------------------------------------------
+%% @doc Calculate the maximum amount of trailing zeros found on the unscaled
+%% value of the bigdec.
+%%
+%% Use tail recursion to validate how many trailing zeros can be found, and
+%% returns the maximum amount of trailing zeros.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec howmany_trailing_zeros(integer(), integer()) -> non_neg_integer().
+howmany_trailing_zeros(Value, Amount) when is_integer(Value),
+                                           is_integer(Amount) ->
   case Value rem (hlp_pow(10, Amount + 1)) == 0 of
-    true  -> has_trailing_zeros(Value, Amount + 1);
+    true  -> howmany_trailing_zeros(Value, Amount + 1);
     false -> Amount
   end.
 
 
 %%=============================================================================
 %% Internal Functions - Utilities
+%%
+%% This section provides utility functions for common helper patterns that does
+%% not have direct connection with #bigdec{}.
 %%=============================================================================
 
 %%-----------------------------------------------------------------------------
