@@ -185,4 +185,15 @@ pow(Num, Exp, Acc)                     -> pow(Num*Num, (Exp-1) div 2, Num*Acc).
 
 -ifdef(TEST).
 
+has_trailing_zeros_test() ->
+  ?assertEqual({true,  3}, bigdec:has_trailing_zeros(#bigdec{value =       1000})),
+  ?assertEqual({true,  3}, bigdec:has_trailing_zeros(#bigdec{value =      -1000})),
+  ?assertEqual({false, 0}, bigdec:has_trailing_zeros(#bigdec{value = 4392345897})).
+
+pow_test() ->
+  ?assertEqual(25,                              bigdec:pow(-5,   2)),
+  ?assertEqual(4261655511456885005249781170176, bigdec:pow(34,  20)),
+  ?assertError(function_clause,                 bigdec:pow(10, 0.5)),
+  ?assertError(function_clause,                 bigdec:pow(10,  -2)).
+
 -endif.
