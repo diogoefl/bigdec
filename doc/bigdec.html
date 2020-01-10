@@ -46,6 +46,7 @@
 <tr><td valign="top"><a href="#is_ten-1">is_ten/1</a></td><td>Validates if bigdec has equivalent value of ten.</td></tr>
 <tr><td valign="top"><a href="#is_zero-1">is_zero/1</a></td><td>Validates if bigdec has equivalent value of zero.</td></tr>
 <tr><td valign="top"><a href="#match_exp-2">match_exp/2</a></td><td>Compare two bigdec values and define what is the matching exponent.</td></tr>
+<tr><td valign="top"><a href="#minus-2">minus/2</a></td><td>Subtracts two bigdec numbers by matching scale if necessary.</td></tr>
 <tr><td valign="top"><a href="#neg-1">neg/1</a></td><td>Negate bigdec changing its sign from 0 to 1 or vice-versa.</td></tr>
 <tr><td valign="top"><a href="#one-0">one/0</a></td><td>Bigdec construct regarding value of one when exponent is 0.</td></tr>
 <tr><td valign="top"><a href="#precision_val-1">precision_val/1</a></td><td>Amount of digits of the unscaled valued for the bigdec, also known as  
@@ -123,6 +124,14 @@ precision of bigdec.</td></tr>
   stripping zeros if they exist. Returns the biggest exponent to be used by
   other functions for calculation, because we can increase exponent without
   losing precision of data, but not the other way around.</p>
+
+<h3 class="function"><a name="minus-2">minus/2</a></h3>
+<div class="spec">
+<p><tt>minus(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
+</div><p><p>Subtracts two bigdec numbers by matching scale if necessary.</p>
+ 
+  The subtraction is a wrapper for inverting sign of Num2 and proceeding with
+  addition. This way we keep logic preserved.</p>
 
 <h3 class="function"><a name="neg-1">neg/1</a></h3>
 <div class="spec">
