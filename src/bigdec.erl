@@ -51,7 +51,7 @@
 -export([]).
 
 %% Arithmetic
--export([add/2]).
+-export([add/2, minus/2]).
 
 %% Transform
 -export([neg/1, strip_zeros/1]).
@@ -156,6 +156,17 @@ add(Num1 = #bigdec{sign = 1}, Num2 = #bigdec{sign = 0}) ->
 add(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
   {_, MatchedNum1, MatchedNum2} = match_exp(Num1, Num2),
   add(MatchedNum1, MatchedNum2).
+
+%%-----------------------------------------------------------------------------
+%% @doc Subtracts two bigdec numbers by matching scale if necessary.
+%%
+%% The subtraction is a wrapper for inverting sign of Num2 and proceeding with
+%% addition. This way we keep logic preserved.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec minus(Number1 :: bigdec(), Number2 :: bigdec()) -> Result :: bigdec().
+minus(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
+  add(Num1, neg(Num2)).
 
 %%=============================================================================
 %% Library public functions - Transform
@@ -596,6 +607,20 @@ add_test() ->
   ?assertEqual(    #bigdec{sign = 0, value = 26011, exp = 2},
                add(#bigdec{sign = 0, value =   698, exp = 0},
                    #bigdec{sign = 1, value = 43789, exp = 2})).
+
+minus_test() ->
+  %% 0.3 - 0.205 = 0.095
+  ?assertEqual(      #bigdec{sign = 0, value =  95, exp = 3},
+               minus(#bigdec{sign = 0, value =   3, exp = 1},
+                     #bigdec{sign = 0, value = 205, exp = 3})),
+  %% -37.45 - 32 = -69.45
+  ?assertEqual(      #bigdec{sign = 1, value = 6945, exp = 2},
+               minus(#bigdec{sign = 1, value = 3745, exp = 2},
+                     #bigdec{sign = 0, value =   32, exp = 0})),
+  %% -37.45 - (-32) = -5.45
+  ?assertEqual(      #bigdec{sign = 1, value =  545, exp = 2},
+               minus(#bigdec{sign = 1, value = 3745, exp = 2},
+                     #bigdec{sign = 1, value =   32, exp = 0})).
 
 neg_test() ->
   ?assertEqual(    #bigdec{sign = 0, value = 120394823, exp = 450},
