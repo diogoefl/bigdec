@@ -41,13 +41,13 @@
 -export([]).
 
 %% Arithmetic
--export([]).
+-export([add/2]).
 
 %% Transform
--export([neg/1]).
+-export([neg/1, strip_zeros/1]).
 
 %% Comparison
--export([]).
+-export([is_zero/1, is_one/1, is_ten/1, contains_integer/1, match_exp/2]).
 
 %% Analysis
 -export([exponent_val/1, unscaled_val/1, sign_val/1, precision_val/1]).
@@ -98,7 +98,7 @@
 %%
 %% Planned functions to be implemented
 %% => Arithmetic
-%% add(  #bigdec{}, #bigdec{})  -> #bigdec{}
+%% add(  #bigdec{}, #bigdec{})  -> #bigdec{} (TODO: eunit testing)
 %% minus(#bigdec{}, #bigdec{})  -> #bigdec{}
 %% mult( #bigdec{}, #bigdec{})  -> #bigdec{}
 %% div(  #bigdec{}, #bigdec{})  -> #bigdec{}
@@ -107,6 +107,47 @@
 %%
 %%=============================================================================
 
+%%-----------------------------------------------------------------------------
+%% @doc Add two bigdec numbers by matching scale if necessary.
+%%
+%% If both numbers contain the same exp value, the resulting bigdec is the sum
+%% of values adjusted by sign with the same exp. But if exp doesn't match we
+%% need to match exp of each number.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec add(#bigdec{}, #bigdec{}) -> #bigdec{}.
+%% When both numbers are positive and exponent matches
+add(#bigdec{sign = 0, value = Value1, exp = Exp},
+    #bigdec{sign = 0, value = Value2, exp = Exp}) ->
+  #bigdec{sign = 0, value = Value1 + Value2, exp = Exp};
+
+%% When first number is positive but second is negative, also exponent matches
+%% and first number has bigger value than second
+add(#bigdec{sign = 0, value = Value1, exp = Exp},
+    #bigdec{sign = 1, value = Value2, exp = Exp}) when Value1 >= Value2->
+  #bigdec{sign = 0, value = Value1 - Value2, exp = Exp};
+
+%% When first number is positive but second is negative, also exponent matches
+%% and first number has smaller value than second
+add(#bigdec{sign = 0, value = Value1, exp = Exp},
+    #bigdec{sign = 1, value = Value2, exp = Exp}) when Value1 < Value2 ->
+  #bigdec{sign = 1, value = Value2 - Value1, exp = Exp};
+
+%% If both number are negative and exponent matches
+add(#bigdec{sign = 1, value = Value1, exp = Exp},
+    #bigdec{sign = 1, value = Value2, exp = Exp}) ->
+  #bigdec{sign = 1, value = Value1 + Value2, exp = Exp};
+
+%% If first number is negative and second number is positive we recursive call
+%% to run causes above
+add(Num1 = #bigdec{sign = 1}, Num2 = #bigdec{sign = 0}) ->
+  add(Num2, Num1);
+
+%% Otherwise we don't have matching exponents and we need to equalize values
+%% first and later recur for above cases to make calculation
+add(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
+  {_, MatchedNum1, MatchedNum2} = match_exp(Num1, Num2),
+  add(MatchedNum1, MatchedNum2).
 
 %%=============================================================================
 %% Library public functions - Transform
@@ -138,12 +179,12 @@
 %%=============================================================================
 
 %%-----------------------------------------------------------------------------
-%% @doc Negate bigdecimal changing its sign from 0 to 1 or vice-versa.
+%% @doc Negate bigdec changing its sign from 0 to 1 or vice-versa.
 %%
 %% If sign defined in bigdec is invalid (different from 0 or 1), we return a
 %% correction bigdec defining sign as 0 (positive of zero).
 %% @end
-%%----------------------------------------------------------------------------
+%%-----------------------------------------------------------------------------
 -spec neg(#bigdec{}) -> #bigdec{}.
 neg(Num = #bigdec{value = 0}) -> Num;
 neg(Num = #bigdec{sign = 0})  -> Num#bigdec{sign = 1};
@@ -151,22 +192,130 @@ neg(Num = #bigdec{sign = 1})  -> Num#bigdec{sign = 0};
 neg(Num = #bigdec{sign = _})  -> Num#bigdec{sign = 0}.
 
 
+%%-----------------------------------------------------------------------------
+%% @doc Strip possible trailing zeros in bigdec number.
+%%
+%% If there is any trailing zero, returns a new bigdec with stripped zeros from
+%% the right side ov value and adjusted exp value. If no trailing zeros are
+%% found in bigdec, the same bigdec is returned.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec strip_zeros(#bigdec{}) -> #bigdec{}.
+strip_zeros(Num = #bigdec{value = Value, exp = Exp}) ->
+  case has_trailing_zeros(Num) of
+    {false,     0} -> Num;
+    {true, Amount} -> Num#bigdec{value = Value div (hlp_pow(10, Amount)),
+                                 exp   = Exp - Amount}
+  end.
+
 %%=============================================================================
 %% Library public functions - Comparison
 %%
 %% Planned functions to be implemented
 %% => Comparisons
-%% max(#bigdec{}, #bigdec{}) -> #bigdec{}
-%% min(#bigdec{}, #bigdec{}) -> #bigdec{}
-%% compare(#bigdec{}, #bigdec{}) -> equal | greater | smaller
+%% max(#bigdec{}, #bigdec{})        -> #bigdec{}
+%% min(#bigdec{}, #bigdec{})        -> #bigdec{}
+%% compare(#bigdec{}, #bigdec{})    -> equal | greater | smaller
 %% is_greater(#bigdec{}, #bigdec{}) -> true | false
-%% is_equal(#bigdec{}, #bigdec{}) -> true | false
+%% is_equal(#bigdec{}, #bigdec{})   -> true | false
 %% is_smaller(#bigdec{}, #bigdec{}) -> true | false
-%% is_zero(#bigdec{}) -> true | false
-%% is_one(#bigdec{}) -> true | false
-%% is_ten(#bigdec{}) -> true | false
+%% is_zero(#bigdec{})               -> true | false (DONE)
+%% is_one(#bigdec{})                -> true | false (DONE)
+%% is_ten(#bigdec{})                -> true | false (DONE)
+%% contains_integer(#bigdec{})      -> true | false (DONE)
+%% match_exp(#bigdec{}, #bigdec{})  -> integer() (DONE)
 %%
 %%=============================================================================
+
+%%-----------------------------------------------------------------------------
+%% @doc Validates if bigdec has equivalent value of zero.
+%%
+%% Checks if bigdec can be precisely represented as zero number, this is
+%% validated by first stripping number, and than checking if value and exp are
+%% equivalent to zero.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec is_zero(#bigdec{}) -> true | false.
+is_zero(Num = #bigdec{}) ->
+  %% First we strip the number for later evaluation
+  #bigdec{value = Value, exp = Exp} = strip_zeros(Num),
+  Value == 0 andalso Exp == 0.
+
+%%-----------------------------------------------------------------------------
+%% @doc Validates if bigdec has equivalent value of one.
+%%
+%% Checks if bigdec can be precisely represented as number one, this is
+%% validated by first stripping number, and than checking if value is equal to
+%% one, sign equal to zero and exp equal to zero.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec is_one(#bigdec{}) -> true | false.
+is_one(Num = #bigdec{}) ->
+  %% First we strip the number for later evaluation
+  #bigdec{sign = Sign, value = Value, exp = Exp} = strip_zeros(Num),
+  Sign == 0 andalso Value == 1 andalso Exp == 0.
+
+%%-----------------------------------------------------------------------------
+%% @doc Validates if bigdec has equivalent value of ten.
+%%
+%% Checks if bigdec can be precisely represented as number ten, this is
+%% validated by first stripping number, and than checking if value is equal to
+%% ten, sign equal to zero and exp equal to zero.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec is_ten(#bigdec{}) -> true | false.
+is_ten(Num = #bigdec{}) ->
+  %% First we strip the number for later evaluation
+  #bigdec{sign = Sign, value = Value, exp = Exp} = strip_zeros(Num),
+  Sign == 0 andalso Value == 10 andalso Exp == 0.
+
+%%-----------------------------------------------------------------------------
+%% @doc Validates if the value contained in bigdec represents an integer.
+%%
+%% Checks if bigdec can be precisely represented as a simple integer, this is
+%% validated by check if exp is zero, and also if the amount of trailing zeros
+%% is equivalent to the exp value.
+%% Function does not use pattern is_* to avoid conflict with BIF is_integer.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec contains_integer(#bigdec{}) -> true | false.
+contains_integer(Num = #bigdec{exp = Exp}) ->
+  case Exp of
+    %% We have no decimal places in bigdec
+    0 -> true;
+    %% We have decimal places but we need to check trailing zeros
+    _ -> case has_trailing_zeros(Num) of
+           %% The amount of trailing zeros is equivalent to decimal places
+           {true, Exp} -> true;
+           %% Any other condition
+           _           -> false
+         end
+  end.
+
+%%-----------------------------------------------------------------------------
+%% @doc Compare two bigdec values and define what is the matching exponent.
+%%
+%% Calculates the common exponent among both bigdec data, but considers first
+%% stripping zeros if they exist. Returns the biggest exponent to be used by
+%% other functions for calculation, because we can increase exponent without
+%% losing precision of data, but not the other way around.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec match_exp(#bigdec{}, #bigdec{}) -> { integer(), #bigdec{}, #bigdec{} }.
+match_exp(Num1 = #bigdec{},
+          Num2 = #bigdec{}) ->
+  %% Retrieve the stripped numbers for calculation
+  StrippedNum1 = #bigdec{value = Value1, exp = Exp1} = strip_zeros(Num1),
+  StrippedNum2 = #bigdec{value = Value2, exp = Exp2} = strip_zeros(Num2),
+  %% Returns the equalized numbers matching exp value
+  case Exp1 > Exp2 of
+    true  -> {Exp1, StrippedNum1,
+                    StrippedNum2#bigdec{value = Value2 * hlp_pow(10,Exp1-Exp2),
+                                        exp   = Exp1}};
+    false -> {Exp2, StrippedNum1#bigdec{value = Value1 * hlp_pow(10,Exp2-Exp1),
+                                        exp   = Exp2},
+                    StrippedNum2}
+  end.
 
 %%=============================================================================
 %% Library public functions - Analysis
@@ -328,19 +477,28 @@ bitstring_processing(validate, Value) ->
 %%-----------------------------------------------------------------------------
 %% @doc Validates if values of bigdec has trailing zeros.
 %%
-%% Analyze bigdec value to check if it has trailing zeros. If it does return
-%% the amount of zeros at the right of the number through a tuple:
-%%     -> {true,  AmountOfZeros}
-%%      | {false,             0}.
+%% Analyze bigdec value to check if it has trailing zeros. Since exp in our
+%% data structure is not supposed to be negative, we need to check also if
+%% the amount found of trailing zeros is bigger than our exp. It it is the
+%% amount to be return needs to be equal to exp. Also if the value of bigdec is
+%% equivalent to zero, we can't calculate the amount of trailing zeros so we
+%% need to return the exp as result for stripping.
 %% @end
 %%-----------------------------------------------------------------------------
 -spec has_trailing_zeros(#bigdec{}) -> {true, integer()}
                                      | {false,        0}.
-has_trailing_zeros(#bigdec{value = Value}) ->
+has_trailing_zeros(#bigdec{value = Value, exp = Exp}) ->
   Amount = howmany_trailing_zeros(Value, 0),
   case Amount of
-    0 -> {false,     0};
-    _ -> {true, Amount}
+    %% No trailing zeros were found
+    0        -> {false,     0};
+    %% BigDec value is equivalent to 0
+    infinity -> {true,    Exp};
+    %% We have trailing zeros, but need to compare with Exp to return smallest
+    _        -> case Amount > Exp of
+                  true  -> {true,    Exp};
+                  false -> {true, Amount}
+                end
   end.
 
 %%-----------------------------------------------------------------------------
@@ -348,16 +506,21 @@ has_trailing_zeros(#bigdec{value = Value}) ->
 %% value of the bigdec.
 %%
 %% Use tail recursion to validate how many trailing zeros can be found, and
-%% returns the maximum amount of trailing zeros.
+%% returns the maximum amount of trailing zeros. If the value of bigdec is zero
+%% than we cant calculate the amount of trailing zeros, therefore we return the
+%% atom infinity, because the exp can be changed to zero as well without losing
+%% numeric precision.
 %% @end
 %%-----------------------------------------------------------------------------
--spec howmany_trailing_zeros(integer(), integer()) -> non_neg_integer().
-howmany_trailing_zeros(Value, Amount) when is_integer(Value),
+-spec howmany_trailing_zeros(integer(), integer()) -> non_neg_integer() | infinity.
+howmany_trailing_zeros(Value, Amount) when Value =/= 0,
+                                           is_integer(Value),
                                            is_integer(Amount) ->
   case Value rem (hlp_pow(10, Amount + 1)) == 0 of
     true  -> howmany_trailing_zeros(Value, Amount + 1);
     false -> Amount
-  end.
+  end;
+howmany_trailing_zeros(Value, _) when Value == 0 -> infinity.
 
 
 %%=============================================================================
@@ -402,6 +565,52 @@ neg_test() ->
   ?assertEqual(    #bigdec{sign =    0, value = 1, exp = 4},
                neg(#bigdec{sign = '-1', value = 1, exp = 4})).
 
+strip_zeros_test() ->
+  ?assertEqual(            #bigdec{sign = 0, value =        34078, exp =  5},
+               strip_zeros(#bigdec{sign = 0, value = 340780000000, exp = 12})),
+  ?assertEqual(            #bigdec{sign = 1, value =    103, exp = 0},
+               strip_zeros(#bigdec{sign = 1, value = 103000, exp = 3})),
+  ?assertEqual(            #bigdec{sign = 0, value = 5001, exp = 12},
+               strip_zeros(#bigdec{sign = 0, value = 5001, exp = 12})).
+
+is_zero_test() ->
+  ?assertEqual(true,  is_zero(zero())),
+  ?assertEqual(true,  is_zero(#bigdec{sign = 1, value = 0, exp = 3})),
+  ?assertEqual(false, is_zero(one())).
+
+is_one_test() ->
+  ?assertEqual(true,  is_one(one())),
+  ?assertEqual(true,  is_one(#bigdec{sign = 0, value = 1000, exp = 3})),
+  ?assertEqual(false, is_one(#bigdec{sign = 0, value = 1000, exp = 2})),
+  ?assertEqual(false, is_one(#bigdec{sign = 1, value = 1000, exp = 3})),
+  ?assertEqual(false, is_one(zero())).
+
+is_ten_test() ->
+  ?assertEqual(true,  is_ten(ten())),
+  ?assertEqual(true,  is_ten(#bigdec{sign = 0, value = 1000, exp = 2})),
+  ?assertEqual(false, is_ten(#bigdec{sign = 0, value = 1000, exp = 1})),
+  ?assertEqual(false, is_ten(#bigdec{sign = 1, value = 1000, exp = 2})),
+  ?assertEqual(false, is_ten(one())).
+
+contains_integer_test() ->
+  ?assertEqual(true,  contains_integer(#bigdec{sign = 1, value =   3, exp = 0})),
+  ?assertEqual(false, contains_integer(#bigdec{sign = 1, value =   3, exp = 3})),
+  ?assertEqual(true,  contains_integer(#bigdec{sign = 0, value = 200, exp = 2})),
+  ?assertEqual(true,  contains_integer( one())),
+  ?assertEqual(true,  contains_integer(zero())),
+  ?assertEqual(true,  contains_integer( ten())).
+
+match_exp_test() ->
+  ?assertEqual({3, #bigdec{value =  10000, exp=3},
+                   #bigdec{value =      5, exp=3}}, match_exp(ten(),
+                                                              #bigdec{value =   5, exp = 3})),
+  ?assertEqual({5, #bigdec{value = 100000, exp=5},
+                   #bigdec{value =      5, exp=5}}, match_exp(one(),
+                                                              #bigdec{value = 500, exp = 7})),
+  ?assertEqual({1, #bigdec{value =     20, exp=1},
+                   #bigdec{value =      1, exp=1}}, match_exp(#bigdec{value =   2, exp = 0},
+                                                              #bigdec{value =   1, exp = 1})).
+
 exponent_val_test() ->
   ?assertEqual(10,  exponent_val(#bigdec{sign = 0, value = 0, exp =  10})),
   ?assertEqual(302, exponent_val(#bigdec{sign = 0, value = 0, exp = 302})).
@@ -445,9 +654,9 @@ bitstring_processing_test() ->
   ?assertEqual(invalid, bitstring_processing(validate, <<"1234A.934">>)).
 
 has_trailing_zeros_test() ->
-  ?assertEqual({true,  3}, has_trailing_zeros(#bigdec{value =       1000})),
-  ?assertEqual({true,  3}, has_trailing_zeros(#bigdec{value =      -1000})),
-  ?assertEqual({false, 0}, has_trailing_zeros(#bigdec{value = 4392345897})).
+  ?assertEqual({true,  3}, has_trailing_zeros(#bigdec{value =       1000, exp = 10})),
+  ?assertEqual({true,  3}, has_trailing_zeros(#bigdec{value =      -1000, exp = 10})),
+  ?assertEqual({false, 0}, has_trailing_zeros(#bigdec{value = 4392345897, exp = 50})).
 
 pow_test() ->
   ?assertEqual(25,                              hlp_pow(-5,   2)),
