@@ -40,6 +40,7 @@
 
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add-2">add/2</a></td><td>Add two bigdec numbers by matching scale if necessary.</td></tr>
+<tr><td valign="top"><a href="#as_text-1">as_text/1</a></td><td>Convert bigdec representation as text.</td></tr>
 <tr><td valign="top"><a href="#contains_integer-1">contains_integer/1</a></td><td>Validates if the value contained in bigdec represents an integer.</td></tr>
 <tr><td valign="top"><a href="#exponent_val-1">exponent_val/1</a></td><td>Value of exponent in bigdec number.</td></tr>
 <tr><td valign="top"><a href="#is_one-1">is_one/1</a></td><td>Validates if bigdec has equivalent value of one.</td></tr>
@@ -68,6 +69,14 @@ precision of bigdec.</td></tr>
   If both numbers contain the same exp value, the resulting bigdec is the sum
   of values adjusted by sign with the same exp. But if exp doesn't match we
   need to match exp of each number.</p>
+
+<h3 class="function"><a name="as_text-1">as_text/1</a></h3>
+<div class="spec">
+<p><tt>as_text(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::&lt;&lt;&gt;&gt;</tt><br></p>
+</div><p><p>Convert bigdec representation as text.</p>
+ 
+  Using calculation of Value * (Sign * -1) * 10 ^ Exp return the format of a
+  bitstring representing the bigdec data.</p>
 
 <h3 class="function"><a name="contains_integer-1">contains_integer/1</a></h3>
 <div class="spec">

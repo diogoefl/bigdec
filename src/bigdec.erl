@@ -48,7 +48,7 @@
 -export([]).
 
 %% Conversion from bigdec
--export([]).
+-export([as_text/1]).
 
 %% Arithmetic
 -export([add/2, minus/2]).
@@ -95,19 +95,41 @@
 %% => Conversion from bigdec
 %% as_float(#bigdec{})            -> float
 %% as_float(#bigdec{}, {options}) -> float
-%% as_text(#bigdec{})             -> bitstring
+%% as_text(#bigdec{})             -> bitstring           (DONE)
 %% as_text(#bigdec{}, {options})  -> bitstring | string
 %%
 %%=============================================================================
 
+%%-----------------------------------------------------------------------------
+%% @doc Convert bigdec representation as text.
+%%
+%% Using calculation of Value * (Sign * -1) * 10 ^ Exp return the format of a
+%% bitstring representing the bigdec data.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec as_text(Number :: bigdec()) -> Result :: <<>>.
+as_text(Num = #bigdec{}) ->
+  #bigdec{sign  = Sign,
+          value = Value,
+          exp   = Exp   } = strip_zeros(Num),
+  ValueString             = integer_to_list(Value),
+  Length                  = string:length(ValueString),
+  LeadingZerosNeeded      = Exp - Length + 1,
+  FullValueString         = hlp_prepend_zeros(ValueString, LeadingZerosNeeded),
+  DotLeadingPosition      = string:length(FullValueString) - Exp,
+  {IntPart, DecPart}      = lists:split(DotLeadingPosition, FullValueString),
+  case Sign of
+    0 -> list_to_bitstring(       IntPart ++ "." ++ DecPart);
+    1 -> list_to_bitstring("-" ++ IntPart ++ "." ++ DecPart)
+  end.
 
 %%=============================================================================
 %% Library public functions - Arithmetic
 %%
 %% Planned functions to be implemented
 %% => Arithmetic
-%% add(  #bigdec{}, #bigdec{})  -> #bigdec{} (LACK eunit testing)
-%% minus(#bigdec{}, #bigdec{})  -> #bigdec{}
+%% add(  #bigdec{}, #bigdec{})  -> #bigdec{} (DONE)
+%% minus(#bigdec{}, #bigdec{})  -> #bigdec{} (DONE)
 %% mult( #bigdec{}, #bigdec{})  -> #bigdec{}
 %% div(  #bigdec{}, #bigdec{})  -> #bigdec{}
 %% pow(  #bigdec{}, integer)    -> #bigdec{}
@@ -576,11 +598,32 @@ hlp_pow(Num, Exp, Acc) when Exp rem 2 == 0 -> hlp_pow(Num*Num, Exp div 2,     Ac
 hlp_pow(Num, Exp, Acc)                     -> hlp_pow(Num*Num, (Exp-1) div 2, Num*Acc).
 
 
+%%-----------------------------------------------------------------------------
+%% @doc Generates string containing leading zeros for formating.
+%%
+%% Based on amount of required leading zeros genetares string prepending zeros
+%% to original string and returns the new string.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec hlp_prepend_zeros(NumberString :: string(), LeadingZeros :: integer()) ->
+                        ResultString :: string().
+hlp_prepend_zeros(IntString, LeadingZeros) when LeadingZeros > 0 ->
+  lists:flatten(lists:duplicate(LeadingZeros, "0"))
+  ++ IntString;
+
+hlp_prepend_zeros(IntString, _) ->
+  IntString.
+
 %%=============================================================================
 %% EUnit Tests
 %%=============================================================================
 
 -ifdef(TEST).
+
+as_text_test() ->
+  ?assertEqual(<<"0.23453">>, as_text(#bigdec{sign = 0, value = 23453, exp = 5})),
+  ?assertEqual(<<"-10.54">>,  as_text(#bigdec{sign = 1, value = 10540, exp = 3})),
+  ?assertEqual(<<"-0.0001">>, as_text(#bigdec{sign = 1, value =     1, exp = 4})).
 
 add_test() ->
   %% 0.1 + 0.2 = 0.3
