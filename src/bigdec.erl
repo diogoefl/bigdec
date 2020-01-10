@@ -26,9 +26,6 @@
 
 %%=============================================================================
 %% Module setup
-%%
-%% @doc bigdec library
-%% @end
 %%=============================================================================
 
 %% Library Public API
@@ -98,7 +95,7 @@
 %%
 %% Planned functions to be implemented
 %% => Arithmetic
-%% add(  #bigdec{}, #bigdec{})  -> #bigdec{} (TODO: eunit testing)
+%% add(  #bigdec{}, #bigdec{})  -> #bigdec{} (LACK eunit testing)
 %% minus(#bigdec{}, #bigdec{})  -> #bigdec{}
 %% mult( #bigdec{}, #bigdec{})  -> #bigdec{}
 %% div(  #bigdec{}, #bigdec{})  -> #bigdec{}

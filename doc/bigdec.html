@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module bigdec</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module bigdec</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Arbitrary Precision Decimal library.
+<p>Copyright © (diogoefl) 2020. All Rights Reserved.</p>
+
+<p><b>Authors:</b> diogoefl
+  
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" basis,
+   without warranties or conditions of any kind, either express or
+   implied. See the License for the specific language governing permissions
+   and limitations under the License..</p>
+
+<h2><a name="description">Description</a></h2><p>Arbitrary Precision Decimal library.</p>
+  
+   Defines group of functions for arithmetic, conversion and data structures
+   when using decimals of arbitrary precision.
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add-2">add/2</a></td><td>Add two bigdec numbers by matching scale if necessary.</td></tr>
+<tr><td valign="top"><a href="#contains_integer-1">contains_integer/1</a></td><td>Validates if the value contained in bigdec represents an integer.</td></tr>
+<tr><td valign="top"><a href="#exponent_val-1">exponent_val/1</a></td><td>Value of exponent in bigdec number.</td></tr>
+<tr><td valign="top"><a href="#is_one-1">is_one/1</a></td><td>Validates if bigdec has equivalent value of one.</td></tr>
+<tr><td valign="top"><a href="#is_ten-1">is_ten/1</a></td><td>Validates if bigdec has equivalent value of ten.</td></tr>
+<tr><td valign="top"><a href="#is_zero-1">is_zero/1</a></td><td>Validates if bigdec has equivalent value of zero.</td></tr>
+<tr><td valign="top"><a href="#match_exp-2">match_exp/2</a></td><td>Compare two bigdec values and define what is the matching exponent.</td></tr>
+<tr><td valign="top"><a href="#neg-1">neg/1</a></td><td>Negate bigdec changing its sign from 0 to 1 or vice-versa.</td></tr>
+<tr><td valign="top"><a href="#one-0">one/0</a></td><td>Bigdec construct regarding value of one when exponent is 0.</td></tr>
+<tr><td valign="top"><a href="#precision_val-1">precision_val/1</a></td><td>Amount of digits of the unscaled valued for the bigdec, also known as  
+precision of bigdec.</td></tr>
+<tr><td valign="top"><a href="#sign_val-1">sign_val/1</a></td><td>Atom defining sign for bigdec.</td></tr>
+<tr><td valign="top"><a href="#strip_zeros-1">strip_zeros/1</a></td><td>Strip possible trailing zeros in bigdec number.</td></tr>
+<tr><td valign="top"><a href="#ten-0">ten/0</a></td><td>Bigdec construct regarding value of ten when exponent is 0.</td></tr>
+<tr><td valign="top"><a href="#unscaled_val-1">unscaled_val/1</a></td><td>Value of unscaled integer representation not applying exponent power.</td></tr>
+<tr><td valign="top"><a href="#zero-0">zero/0</a></td><td>Bigdec construct regarding value of zero when exponent is 0.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="add-2">add/2</a></h3>
+<div class="spec">
+<p><tt>add(Bigdec::#bigdec{}, Bigdec::#bigdec{}) -&gt; #bigdec{}</tt><br></p>
+</div><p><p>Add two bigdec numbers by matching scale if necessary.</p>
+ 
+  If both numbers contain the same exp value, the resulting bigdec is the sum
+  of values adjusted by sign with the same exp. But if exp doesn't match we
+  need to match exp of each number.</p>
+
+<h3 class="function"><a name="contains_integer-1">contains_integer/1</a></h3>
+<div class="spec">
+<p><tt>contains_integer(Bigdec::#bigdec{}) -&gt; true | false</tt><br></p>
+</div><p><p>Validates if the value contained in bigdec represents an integer.</p>
+ 
+  Checks if bigdec can be precisely represented as a simple integer, this is
+  validated by check if exp is zero, and also if the amount of trailing zeros
+  is equivalent to the exp value.
+  Function does not use pattern is_* to avoid conflict with BIF is_integer.</p>
+
+<h3 class="function"><a name="exponent_val-1">exponent_val/1</a></h3>
+<div class="spec">
+<p><tt>exponent_val(Bigdec::#bigdec{}) -&gt; integer()</tt><br></p>
+</div><p><p>Value of exponent in bigdec number.</p>
+ 
+  The exponent is the component N on the number representation of V * 10 ^ -N.
+  Exponent value in bigdec is neg against the representation, meaning that for
+  example 0.2 is represented as (2 * 10 ^ -1) and the exponent value is +1.</p>
+
+<h3 class="function"><a name="is_one-1">is_one/1</a></h3>
+<div class="spec">
+<p><tt>is_one(Bigdec::#bigdec{}) -&gt; true | false</tt><br></p>
+</div><p><p>Validates if bigdec has equivalent value of one.</p>
+ 
+  Checks if bigdec can be precisely represented as number one, this is
+  validated by first stripping number, and than checking if value is equal to
+  one, sign equal to zero and exp equal to zero.</p>
+
+<h3 class="function"><a name="is_ten-1">is_ten/1</a></h3>
+<div class="spec">
+<p><tt>is_ten(Bigdec::#bigdec{}) -&gt; true | false</tt><br></p>
+</div><p><p>Validates if bigdec has equivalent value of ten.</p>
+ 
+  Checks if bigdec can be precisely represented as number ten, this is
+  validated by first stripping number, and than checking if value is equal to
+  ten, sign equal to zero and exp equal to zero.</p>
+
+<h3 class="function"><a name="is_zero-1">is_zero/1</a></h3>
+<div class="spec">
+<p><tt>is_zero(Bigdec::#bigdec{}) -&gt; true | false</tt><br></p>
+</div><p><p>Validates if bigdec has equivalent value of zero.</p>
+ 
+  Checks if bigdec can be precisely represented as zero number, this is
+  validated by first stripping number, and than checking if value and exp are
+  equivalent to zero.</p>
+
+<h3 class="function"><a name="match_exp-2">match_exp/2</a></h3>
+<div class="spec">
+<p><tt>match_exp(Bigdec::#bigdec{}, Bigdec::#bigdec{}) -&gt; {integer(), #bigdec{}, #bigdec{}}</tt><br></p>
+</div><p><p>Compare two bigdec values and define what is the matching exponent.</p>
+ 
+  Calculates the common exponent among both bigdec data, but considers first
+  stripping zeros if they exist. Returns the biggest exponent to be used by
+  other functions for calculation, because we can increase exponent without
+  losing precision of data, but not the other way around.</p>
+
+<h3 class="function"><a name="neg-1">neg/1</a></h3>
+<div class="spec">
+<p><tt>neg(Bigdec::#bigdec{}) -&gt; #bigdec{}</tt><br></p>
+</div><p><p>Negate bigdec changing its sign from 0 to 1 or vice-versa.</p>
+ 
+  If sign defined in bigdec is invalid (different from 0 or 1), we return a
+  correction bigdec defining sign as 0 (positive of zero).</p>
+
+<h3 class="function"><a name="one-0">one/0</a></h3>
+<div class="spec">
+<p><tt>one() -&gt; #bigdec{}</tt><br></p>
+</div><p>Bigdec construct regarding value of one when exponent is 0.</p>
+
+<h3 class="function"><a name="precision_val-1">precision_val/1</a></h3>
+<div class="spec">
+<p><tt>precision_val(Bigdec::#bigdec{}) -&gt; non_neg_integer()</tt><br></p>
+</div><p><p>Amount of digits of the unscaled valued for the bigdec, also known as  
+precision of bigdec.</p>
+ 
+  Calculates the amount of digits found in the representation of the unscaled
+  value for the bigdec. This amount is not stripped of trailing zeros.</p>
+
+<h3 class="function"><a name="sign_val-1">sign_val/1</a></h3>
+<div class="spec">
+<p><tt>sign_val(Bigdec::#bigdec{}) -&gt; positive | negative | invalid</tt><br></p>
+</div><p><p>Atom defining sign for bigdec.</p>
+ 
+  The sign used in bigdec structures use 0 for postive or zero numbers, and 1
+  for negative numbers. This functions returns atom positive if sign is 0 and
+  atom negative if sign is 1. If bigdec gets incorrect data and sign is not 0
+  or 1, than atom invalid is returned.</p>
+
+<h3 class="function"><a name="strip_zeros-1">strip_zeros/1</a></h3>
+<div class="spec">
+<p><tt>strip_zeros(Bigdec::#bigdec{}) -&gt; #bigdec{}</tt><br></p>
+</div><p><p>Strip possible trailing zeros in bigdec number.</p>
+ 
+  If there is any trailing zero, returns a new bigdec with stripped zeros from
+  the right side ov value and adjusted exp value. If no trailing zeros are
+  found in bigdec, the same bigdec is returned.</p>
+
+<h3 class="function"><a name="ten-0">ten/0</a></h3>
+<div class="spec">
+<p><tt>ten() -&gt; #bigdec{}</tt><br></p>
+</div><p>Bigdec construct regarding value of ten when exponent is 0.</p>
+
+<h3 class="function"><a name="unscaled_val-1">unscaled_val/1</a></h3>
+<div class="spec">
+<p><tt>unscaled_val(Bigdec::#bigdec{}) -&gt; non_neg_integer()</tt><br></p>
+</div><p><p>Value of unscaled integer representation not applying exponent power.</p>
+ 
+  The unscaled value represents the number that multiplied by power of exp by
+  10 represents the real value of bigdec. The unscaled value is not stripped
+  of trailing zeros.</p>
+
+<h3 class="function"><a name="zero-0">zero/0</a></h3>
+<div class="spec">
+<p><tt>zero() -&gt; #bigdec{}</tt><br></p>
+</div><p>Bigdec construct regarding value of zero when exponent is 0.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc</i></p>
+</body>
+</html>
