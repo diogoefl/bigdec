@@ -1,6 +1,8 @@
 %%%----------------------------------------------------------------------------
-%%% @copyright (diogoefl) 2020. All Rights Reserved.
+%%% BigDec Library
+%%%
 %%% @author diogoefl
+%%% @copyright (diogoefl) 2020. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -23,6 +25,17 @@
 %%%----------------------------------------------------------------------------
 
 -module(bigdec).
+
+%%=============================================================================
+%% Records and Macros
+%%=============================================================================
+
+-record(bigdec, {sign  = 0 :: 0 | 1,
+                 value = 0 :: non_neg_integer(),
+                 exp   = 0 :: non_neg_integer()}).
+
+-type   bigdec() :: #bigdec{}.
+-export_type([bigdec/0]).
 
 %%=============================================================================
 %% Module setup
@@ -51,8 +64,6 @@
 
 %% Constants
 -export([one/0, zero/0, ten/0]).
-
--include("bigdec.hrl").
 
 %%=============================================================================
 %% EUnit setup
@@ -112,28 +123,28 @@
 %% need to match exp of each number.
 %% @end
 %%-----------------------------------------------------------------------------
--spec add(#bigdec{}, #bigdec{}) -> #bigdec{}.
+-spec add(Number1 :: bigdec(), Number2 :: bigdec()) -> Result :: bigdec().
 %% When both numbers are positive and exponent matches
 add(#bigdec{sign = 0, value = Value1, exp = Exp},
     #bigdec{sign = 0, value = Value2, exp = Exp}) ->
-  #bigdec{sign = 0, value = Value1 + Value2, exp = Exp};
+  strip_zeros(#bigdec{sign = 0, value = Value1 + Value2, exp = Exp});
 
 %% When first number is positive but second is negative, also exponent matches
 %% and first number has bigger value than second
 add(#bigdec{sign = 0, value = Value1, exp = Exp},
     #bigdec{sign = 1, value = Value2, exp = Exp}) when Value1 >= Value2->
-  #bigdec{sign = 0, value = Value1 - Value2, exp = Exp};
+  strip_zeros(#bigdec{sign = 0, value = Value1 - Value2, exp = Exp});
 
 %% When first number is positive but second is negative, also exponent matches
 %% and first number has smaller value than second
 add(#bigdec{sign = 0, value = Value1, exp = Exp},
     #bigdec{sign = 1, value = Value2, exp = Exp}) when Value1 < Value2 ->
-  #bigdec{sign = 1, value = Value2 - Value1, exp = Exp};
+  strip_zeros(#bigdec{sign = 1, value = Value2 - Value1, exp = Exp});
 
 %% If both number are negative and exponent matches
 add(#bigdec{sign = 1, value = Value1, exp = Exp},
     #bigdec{sign = 1, value = Value2, exp = Exp}) ->
-  #bigdec{sign = 1, value = Value1 + Value2, exp = Exp};
+  strip_zeros(#bigdec{sign = 1, value = Value1 + Value2, exp = Exp});
 
 %% If first number is negative and second number is positive we recursive call
 %% to run causes above
@@ -182,7 +193,7 @@ add(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 %% correction bigdec defining sign as 0 (positive of zero).
 %% @end
 %%-----------------------------------------------------------------------------
--spec neg(#bigdec{}) -> #bigdec{}.
+-spec neg(Number :: bigdec()) -> Result :: bigdec().
 neg(Num = #bigdec{value = 0}) -> Num;
 neg(Num = #bigdec{sign = 0})  -> Num#bigdec{sign = 1};
 neg(Num = #bigdec{sign = 1})  -> Num#bigdec{sign = 0};
@@ -197,7 +208,7 @@ neg(Num = #bigdec{sign = _})  -> Num#bigdec{sign = 0}.
 %% found in bigdec, the same bigdec is returned.
 %% @end
 %%-----------------------------------------------------------------------------
--spec strip_zeros(#bigdec{}) -> #bigdec{}.
+-spec strip_zeros(Number :: bigdec()) -> Result :: bigdec().
 strip_zeros(Num = #bigdec{value = Value, exp = Exp}) ->
   case has_trailing_zeros(Num) of
     {false,     0} -> Num;
@@ -232,7 +243,7 @@ strip_zeros(Num = #bigdec{value = Value, exp = Exp}) ->
 %% equivalent to zero.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_zero(#bigdec{}) -> true | false.
+-spec is_zero(Number :: bigdec()) -> Result :: true | false.
 is_zero(Num = #bigdec{}) ->
   %% First we strip the number for later evaluation
   #bigdec{value = Value, exp = Exp} = strip_zeros(Num),
@@ -246,7 +257,7 @@ is_zero(Num = #bigdec{}) ->
 %% one, sign equal to zero and exp equal to zero.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_one(#bigdec{}) -> true | false.
+-spec is_one(Number :: bigdec()) -> Result :: true | false.
 is_one(Num = #bigdec{}) ->
   %% First we strip the number for later evaluation
   #bigdec{sign = Sign, value = Value, exp = Exp} = strip_zeros(Num),
@@ -260,7 +271,7 @@ is_one(Num = #bigdec{}) ->
 %% ten, sign equal to zero and exp equal to zero.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_ten(#bigdec{}) -> true | false.
+-spec is_ten(Number :: bigdec()) -> Result :: true | false.
 is_ten(Num = #bigdec{}) ->
   %% First we strip the number for later evaluation
   #bigdec{sign = Sign, value = Value, exp = Exp} = strip_zeros(Num),
@@ -275,7 +286,7 @@ is_ten(Num = #bigdec{}) ->
 %% Function does not use pattern is_* to avoid conflict with BIF is_integer.
 %% @end
 %%-----------------------------------------------------------------------------
--spec contains_integer(#bigdec{}) -> true | false.
+-spec contains_integer(Number :: bigdec()) -> Result :: true | false.
 contains_integer(Num = #bigdec{exp = Exp}) ->
   case Exp of
     %% We have no decimal places in bigdec
@@ -298,7 +309,8 @@ contains_integer(Num = #bigdec{exp = Exp}) ->
 %% losing precision of data, but not the other way around.
 %% @end
 %%-----------------------------------------------------------------------------
--spec match_exp(#bigdec{}, #bigdec{}) -> { integer(), #bigdec{}, #bigdec{} }.
+-spec match_exp(Number1 :: bigdec(), Number2 :: bigdec()) ->
+                Result  :: {integer(), bigdec(), bigdec()}.
 match_exp(Num1 = #bigdec{},
           Num2 = #bigdec{}) ->
   %% Retrieve the stripped numbers for calculation
@@ -326,7 +338,7 @@ match_exp(Num1 = #bigdec{},
 %% example 0.2 is represented as (2 * 10 ^ -1) and the exponent value is +1.
 %% @end
 %%----------------------------------------------------------------------------
--spec exponent_val(#bigdec{}) -> integer().
+-spec exponent_val(Number :: bigdec()) -> Result :: integer().
 exponent_val(#bigdec{exp = Value}) -> Value.
 
 %%-----------------------------------------------------------------------------
@@ -337,7 +349,7 @@ exponent_val(#bigdec{exp = Value}) -> Value.
 %% of trailing zeros.
 %% @end
 %%----------------------------------------------------------------------------
--spec unscaled_val(#bigdec{}) -> non_neg_integer().
+-spec unscaled_val(Number :: bigdec()) -> Result :: non_neg_integer().
 unscaled_val(#bigdec{value = Value}) -> Value.
 
 %%-----------------------------------------------------------------------------
@@ -349,7 +361,7 @@ unscaled_val(#bigdec{value = Value}) -> Value.
 %% or 1, than atom invalid is returned.
 %% @end
 %%----------------------------------------------------------------------------
--spec sign_val(#bigdec{}) -> positive | negative | invalid.
+-spec sign_val(Number :: bigdec()) -> Result :: positive | negative | invalid.
 sign_val(#bigdec{sign = 0}) -> positive;
 sign_val(#bigdec{sign = 1}) -> negative;
 sign_val(#bigdec{sign = _}) -> invalid.
@@ -362,7 +374,7 @@ sign_val(#bigdec{sign = _}) -> invalid.
 %% value for the bigdec. This amount is not stripped of trailing zeros.
 %% @end
 %%----------------------------------------------------------------------------
--spec precision_val(#bigdec{}) -> non_neg_integer().
+-spec precision_val(Number :: bigdec()) -> Result :: non_neg_integer().
 precision_val(#bigdec{value = Value}) ->
   StringVal = integer_to_list(Value),
   string:length(StringVal).
@@ -375,21 +387,21 @@ precision_val(#bigdec{value = Value}) ->
 %% @doc Bigdec construct regarding value of one when exponent is 0.
 %% @end
 %%----------------------------------------------------------------------------
--spec one() -> #bigdec{}.
+-spec one() -> Result :: bigdec().
 one() -> #bigdec{sign = 0, value = 1, exp = 0}.
 
 %%-----------------------------------------------------------------------------
 %% @doc Bigdec construct regarding value of zero when exponent is 0.
 %% @end
 %%----------------------------------------------------------------------------
--spec zero() -> #bigdec{}.
+-spec zero() -> Result :: bigdec().
 zero() -> #bigdec{sign = 0, value = 0, exp = 0}.
 
 %%-----------------------------------------------------------------------------
 %% @doc Bigdec construct regarding value of ten when exponent is 0.
 %% @end
 %%----------------------------------------------------------------------------
--spec ten() -> #bigdec{}.
+-spec ten() -> Result :: bigdec().
 ten() -> #bigdec{sign = 0, value = 10, exp = 0}.
 
 %%=============================================================================
@@ -403,7 +415,7 @@ ten() -> #bigdec{sign = 0, value = 10, exp = 0}.
 %% conversion. Otherwise will use 6 decimal places as precision.
 %% @end
 %%----------------------------------------------------------------------------
--spec float_to_bitstring(float()) -> bitstring().
+-spec float_to_bitstring(Number :: float()) -> Result :: bitstring().
 float_to_bitstring(FloatNum) ->
   case erlang:system_info(wordsize) of
     8 -> float_to_bitstring(FloatNum, 14);  %% We are on 64bit system
@@ -418,7 +430,9 @@ float_to_bitstring(FloatNum) ->
 %% 7 decimal places for 32 bit systems.
 %% @end
 %%----------------------------------------------------------------------------
--spec float_to_bitstring(float(), non_neg_integer()) -> bitstring().
+-spec float_to_bitstring(Number        :: float(),
+                         DecimalPlaces :: non_neg_integer()) ->
+                         Result        :: bitstring().
 float_to_bitstring(FloatNum, DecimalPlaces) ->
   FormatString = "~." ++ integer_to_list(DecimalPlaces) ++ "f",
   list_to_binary(io_lib:format(FormatString, [FloatNum])).
@@ -453,7 +467,7 @@ bitstring_to_bigdec(Value) ->
     nomatch        -> erlang:error(not_implemented)
   end.
 
--spec bitstring_processing(validate, bitstring()) -> valid | invalid.
+-spec bitstring_processing(validate, Text :: bitstring()) -> Result :: valid | invalid.
 bitstring_processing(validate, Value) ->
   Regexp = "[+-]?[0-9]+(\.[0-9]+)?([Ee][+-]?[0-9]+)?",
   Length = string:length(Value),
@@ -482,8 +496,8 @@ bitstring_processing(validate, Value) ->
 %% need to return the exp as result for stripping.
 %% @end
 %%-----------------------------------------------------------------------------
--spec has_trailing_zeros(#bigdec{}) -> {true, integer()}
-                                     | {false,        0}.
+-spec has_trailing_zeros(Number :: bigdec()) -> Result :: {true, Amount :: integer()}
+                                                        | {false,                  0}.
 has_trailing_zeros(#bigdec{value = Value, exp = Exp}) ->
   Amount = howmany_trailing_zeros(Value, 0),
   case Amount of
@@ -509,7 +523,8 @@ has_trailing_zeros(#bigdec{value = Value, exp = Exp}) ->
 %% numeric precision.
 %% @end
 %%-----------------------------------------------------------------------------
--spec howmany_trailing_zeros(integer(), integer()) -> non_neg_integer() | infinity.
+-spec howmany_trailing_zeros(Number :: integer(), Acc :: integer()) ->
+                             Result :: non_neg_integer() | infinity.
 howmany_trailing_zeros(Value, Amount) when Value =/= 0,
                                            is_integer(Value),
                                            is_integer(Amount) ->
@@ -535,7 +550,9 @@ howmany_trailing_zeros(Value, _) when Value == 0 -> infinity.
 %% these cases it returns error.
 %% @end
 %%-----------------------------------------------------------------------------
--spec hlp_pow(integer(), non_neg_integer()) -> integer().
+-spec hlp_pow(Number   :: integer(),
+              Exponent :: non_neg_integer()) ->
+              Result   :: integer().
 hlp_pow(Number, Exponent) when is_integer(Number),
                             is_integer(Exponent),
                             Exponent >= 0         ->
@@ -553,6 +570,32 @@ hlp_pow(Num, Exp, Acc)                     -> hlp_pow(Num*Num, (Exp-1) div 2, Nu
 %%=============================================================================
 
 -ifdef(TEST).
+
+add_test() ->
+  %% 0.1 + 0.2 = 0.3
+  ?assertEqual(#bigdec{sign = 0, value = 3, exp = 1},
+               add(#bigdec{sign = 0, value =  1, exp = 1},
+                   #bigdec{sign = 0, value = 20, exp = 2})),
+  %% 2.2 + 8.8 = 11
+  ?assertEqual(    #bigdec{sign = 0, value =  11, exp = 0},
+               add(#bigdec{sign = 0, value =  22, exp = 1},
+                   #bigdec{sign = 0, value = 880, exp = 2})),
+  %% 10 + 1 = 11
+  ?assertEqual(    #bigdec{sign = 0, value = 11, exp = 0},
+               add(#bigdec{sign = 0, value = 10, exp = 0},
+                   #bigdec{sign = 0, value =  1, exp = 0})),
+  %% -5.680 + 3.40 = -2.28
+  ?assertEqual(    #bigdec{sign = 1, value =  228, exp = 2},
+               add(#bigdec{sign = 1, value = 5680, exp = 3},
+                   #bigdec{sign = 0, value =  340, exp = 2})),
+  %% -789.457300 - 3.28 = - 792.7373
+  ?assertEqual(    #bigdec{sign = 1, value =   7927373, exp = 4},
+               add(#bigdec{sign = 1, value = 789457300, exp = 6},
+                   #bigdec{sign = 1, value =       328, exp = 2})),
+  %% 698 - 437.89 = 260.11
+  ?assertEqual(    #bigdec{sign = 0, value = 26011, exp = 2},
+               add(#bigdec{sign = 0, value =   698, exp = 0},
+                   #bigdec{sign = 1, value = 43789, exp = 2})).
 
 neg_test() ->
   ?assertEqual(    #bigdec{sign = 0, value = 120394823, exp = 450},
