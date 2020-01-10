@@ -27,9 +27,9 @@
 %% Data Structures
 %%=============================================================================
 
--record(bigdec, {sign  :: 0 | 1,
-                 value :: non_neg_integer(),
-                 exp   :: non_neg_integer()}).
+-record(bigdec, {sign  = 0 :: 0 | 1,
+                 value = 0 :: non_neg_integer(),
+                 exp   = 0 :: non_neg_integer()}).
 
 %%=============================================================================
 %% Macros
