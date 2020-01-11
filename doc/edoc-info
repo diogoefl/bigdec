@@ -1,3 +1,4 @@
 %% encoding: UTF-8
 {application,bigdec}.
-{modules,[bigdec]}.
+{modules,[bigdec,bigdec_analysis,bigdec_common,bigdec_comp,bigdec_const,
+          bigdec_transform]}.

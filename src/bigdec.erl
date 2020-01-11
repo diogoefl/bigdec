@@ -15,7 +15,7 @@
 %%% without warranties or conditions of any kind, either express or
 %%% implied. See the License for the specific language governing permissions
 %%% and limitations under the License.
-%%%
+%%%`
 %%% @doc Arbitrary Precision Decimal library.
 %%%
 %%% Defines group of functions for arithmetic, conversion and data structures
@@ -25,17 +25,20 @@
 %%%----------------------------------------------------------------------------
 
 -module(bigdec).
+%% @headerfile ["bigdec.hrl"]
 
 %%=============================================================================
-%% Records and Macros
+%% Data Structures
 %%=============================================================================
 
--record(bigdec, {sign  = 0 :: 0 | 1,
-                 value = 0 :: non_neg_integer(),
-                 exp   = 0 :: non_neg_integer()}).
-
--type   bigdec() :: #bigdec{}.
--export_type([bigdec/0]).
+-include("bigdec.hrl").
+-type     bigdec() :: #bigdec{sign  :: 0 | 1,
+                              value :: non_neg_integer(),
+                              exp   :: non_neg_integer()}.
+%% bigdec() defines tuple object representing a BigDec number. The data
+%% structure of bigdec is formed by 3 elements: sign, integer value and
+%% exponent. These three elements form the definition of the number based on
+%% the following formula: (Sign * -1) * IntValue * (10 ^ Exp).
 
 %%=============================================================================
 %% Module setup
@@ -53,18 +56,18 @@
 %% Arithmetic
 -export([add/2, minus/2]).
 
-%% Transform
+%% bigdec_transform module
 -export([neg/1, strip_zeros/1]).
 
-%% Comparison
+%% bigdec_comp module
 -export([min/2, max/2, compare/2, is_smaller_or_equal/2, is_greater_or_equal/2,
          is_equal/2, is_smaller/2, is_greater/2, is_zero/1, is_one/1, is_ten/1,
          contains_integer/1, match_exp/2]).
 
-%% Analysis
+%% bigdec_analysis module
 -export([exponent_val/1, unscaled_val/1, sign_val/1, precision_val/1]).
 
-%% Constants
+%% bigdec_const module
 -export([one/0, zero/0, ten/0]).
 
 %%=============================================================================
@@ -117,7 +120,7 @@ as_text(Num = #bigdec{}) ->
   ValueString             = integer_to_list(Value),
   Length                  = string:length(ValueString),
   LeadingZerosNeeded      = Exp - Length + 1,
-  FullValueString         = hlp_prepend_zeros(ValueString, LeadingZerosNeeded),
+  FullValueString         = bigdec_common:hlp_prepend_zeros(ValueString, LeadingZerosNeeded),
   DotLeadingPosition      = string:length(FullValueString) - Exp,
   {IntPart, DecPart}      = lists:split(DotLeadingPosition, FullValueString),
   case Sign of
@@ -193,32 +196,7 @@ minus(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
   add(Num1, neg(Num2)).
 
 %%=============================================================================
-%% Library public functions - Transform
-%%
-%% Planned functions to be implemented
-%% => Transform
-%% neg(#bigdec{])                                     -> #bigdec{} (DONE)
-%% round(#bigdec{})                                   -> #bigdec{}
-%% round(#bigdec{}, rounding_pattern)                 -> #bigdec{}
-%% change_exp(#bigdec{}, integer())                   -> #bigdec{}
-%% change_exp(#bigdec{}, integer(), rounding_pattern) -> #bigdec{}
-%% strip_zeros(#bigdec{})                             -> #bigdec{}
-%% rescale_by(#bigdec{}, integer())                   -> #bigdec{}
-%% incr_exp(#bigdec{})                                -> #bigdec{}
-%% decr_exp(#bigdec{})                                -> #bigdec{}
-%%
-%% => Rounding Patterns
-%% round_up        => Increments the digit prior to a nonzero discarded fraction
-%% round_down      => Doesn't increment the digit prior to a discarded fraction (trunc)
-%% round_ceiling   => Round towards positive infinity - if sign is positive act as
-%%                    round_up, if is negative act as round_down
-%% round_floor     => Round towards negative infinity - if sign is positive act as
-%%                    round_down, it is negative act as round_up
-%% round_half_up   => If the discarded fraction is >= 0.5, use round_up
-%% round_half_down => If the discarded fraction is >  0.5, use round_up
-%% round_half_even => If remainder digit from discard (left digit to the discarded fraction)
-%%                    is even, act as round_half_up, otherwise use round_half_down
-%%
+%% bigdec_transform module
 %%=============================================================================
 
 %%-----------------------------------------------------------------------------
@@ -229,10 +207,7 @@ minus(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 %% @end
 %%-----------------------------------------------------------------------------
 -spec neg(Number :: bigdec()) -> Result :: bigdec().
-neg(Num = #bigdec{value = 0}) -> Num;
-neg(Num = #bigdec{sign = 0})  -> Num#bigdec{sign = 1};
-neg(Num = #bigdec{sign = 1})  -> Num#bigdec{sign = 0};
-neg(Num = #bigdec{sign = _})  -> Num#bigdec{sign = 0}.
+neg(Num = #bigdec{}) -> bigdec_transform:neg(Num).
 
 
 %%-----------------------------------------------------------------------------
@@ -244,12 +219,7 @@ neg(Num = #bigdec{sign = _})  -> Num#bigdec{sign = 0}.
 %% @end
 %%-----------------------------------------------------------------------------
 -spec strip_zeros(Number :: bigdec()) -> Result :: bigdec().
-strip_zeros(Num = #bigdec{value = Value, exp = Exp}) ->
-  case has_trailing_zeros(Num) of
-    {false,     0} -> Num;
-    {true, Amount} -> Num#bigdec{value = Value div (hlp_pow(10, Amount)),
-                                 exp   = Exp - Amount}
-  end.
+strip_zeros(Num = #bigdec{}) -> bigdec_transform:strip_zeros(Num).
 
 %%=============================================================================
 %% Library public functions - Comparison
@@ -278,11 +248,7 @@ strip_zeros(Num = #bigdec{value = Value, exp = Exp}) ->
 %% @end
 %%-----------------------------------------------------------------------------
 -spec max(Number1 :: bigdec(), Number2 :: bigdec()) -> MaxValue :: bigdec().
-max(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
-  case is_greater_or_equal(Num1, Num2) of
-    true  -> Num1;
-    false -> Num2
-  end.
+max(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:max(Num1, Num2).
 
 %%-----------------------------------------------------------------------------
 %% @doc Returns which of the two BigDec Numbers is the smallest in value, and
@@ -290,11 +256,7 @@ max(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 %% @end
 %%-----------------------------------------------------------------------------
 -spec min(Number1 :: bigdec(), Number2 :: bigdec()) -> MinValue :: bigdec().
-min(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
-  case is_smaller_or_equal(Num1, Num2) of
-    true  -> Num1;
-    false -> Num2
-  end.
+min(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:min(Num1, Num2).
 
 %%-----------------------------------------------------------------------------
 %% @doc Compares BigDec Number1 with BigDec Number2 and returns atom defining
@@ -303,14 +265,7 @@ min(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 %%-----------------------------------------------------------------------------
 -spec compare(Number1 :: bigdec(), Number2 :: bigdec()) ->
               Result :: equal | greater | smaller.
-compare(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
-  case is_equal(Num1, Num2) of
-    true  -> equal;
-    false -> case is_smaller(Num1, Num2) of
-               true  -> smaller;
-               false -> greater
-             end
-  end.
+compare(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:compare(Num1, Num2).
 
 %%-----------------------------------------------------------------------------
 %% @doc Verifies if both bigdec numbers have equal numerical values.
@@ -322,19 +277,7 @@ compare(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 -spec is_equal(Number1 :: bigdec(),
                Number2 :: bigdec()) ->
                Result  :: true | false.
-%% They don't match in exponent - recalculate matching exponents for comparison
-is_equal(Num1 = #bigdec{exp = Exp1},
-         Num2 = #bigdec{exp = Exp2}) when Exp1 =/= Exp2 ->
-  {_, MatchingNum1, MatchingNum2} = match_exp(Num1, Num2),
-  is_equal(MatchingNum1, MatchingNum2);
-
-%% Both have the same sign, value and exponent
-is_equal(#bigdec{sign = Sign, value = Value, exp = Exp},
-         #bigdec{sign = Sign, value = Value, exp = Exp}) -> true;
-
-%% Any other case when matching exponents means they are not equals
-is_equal(#bigdec{exp = Exp},
-         #bigdec{exp = Exp}) -> false.
+is_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:is_equal(Num1, Num2).
 
 %%-----------------------------------------------------------------------------
 %% @doc Verifies if first argument is smaller than second argument.
@@ -345,31 +288,7 @@ is_equal(#bigdec{exp = Exp},
 -spec is_smaller(Number1 :: bigdec(),
                  Number2 :: bigdec()) ->
                  Result  :: true | false.
-%% They don't match in exponent - recalculate matching exponents for comparison
-is_smaller(Num1 = #bigdec{exp = Exp1},
-           Num2 = #bigdec{exp = Exp2}) when Exp1 =/= Exp2 ->
-  {_, MatchingNum1, MatchingNum2} = match_exp(Num1, Num2),
-  is_smaller(MatchingNum1, MatchingNum2);
-
-%% Both are positive and exponent is equal, than we can compare values
-is_smaller(#bigdec{sign = 0, value = Val1, exp = Exp},
-           #bigdec{sign = 0, value = Val2, exp = Exp}) when Val1 < Val2 ->
-  true;
-
-%% Both are negative and exponent is equal, than we can compare values
-is_smaller(#bigdec{sign = 1, value = Val1, exp = Exp},
-           #bigdec{sign = 1, value = Val2, exp = Exp}) when Val1 > Val2 ->
-  true;
-
-%% Num1 is negative and Num2 is positive and exponent is equal, we don't need
-%% to check the values because a negative number will always be smaller
-is_smaller(#bigdec{sign = 1, exp = Exp},
-           #bigdec{sign = 0, exp = Exp}) ->
-  true;
-
-%% Any other case when matching exponents means Num1 is not smaller than Num2
-is_smaller(#bigdec{exp = Exp},
-           #bigdec{exp = Exp}) -> false.
+is_smaller(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:is_smaller(Num1, Num2).
 
 %%-----------------------------------------------------------------------------
 %% @doc Verifies if first argument is greater than second argument.
@@ -380,31 +299,7 @@ is_smaller(#bigdec{exp = Exp},
 -spec is_greater(Number1 :: bigdec(),
                  Number2 :: bigdec()) ->
                  Result  :: true | false.
-%% They don't match in exponent - recalculate matching exponents for comparison
-is_greater(Num1 = #bigdec{exp = Exp1},
-           Num2 = #bigdec{exp = Exp2}) when Exp1 =/= Exp2 ->
-  {_, MatchingNum1, MatchingNum2} = match_exp(Num1, Num2),
-  is_greater(MatchingNum1, MatchingNum2);
-
-%% Both are positive and exponent is equal, than we can compare values
-is_greater(#bigdec{sign = 0, value = Val1, exp = Exp},
-           #bigdec{sign = 0, value = Val2, exp = Exp}) when Val1 > Val2 ->
-  true;
-
-%% Both are negative and exponent is equal, than we can compare values
-is_greater(#bigdec{sign = 1, value = Val1, exp = Exp},
-           #bigdec{sign = 1, value = Val2, exp = Exp}) when Val1 < Val2 ->
-  true;
-
-%% Num1 is positive and Num2 is negative and exponent is equal, we don't need
-%% to check the values because a negative number will always be smaller
-is_greater(#bigdec{sign = 0, exp = Exp},
-           #bigdec{sign = 1, exp = Exp}) ->
-  true;
-
-%% Any other case when matching exponents means Num1 is not greater than Num2
-is_greater(#bigdec{exp = Exp},
-           #bigdec{exp = Exp}) -> false.
+is_greater(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:is_greater(Num1, Num2).
 
 %%-----------------------------------------------------------------------------
 %% @doc Validates if BigDec Number1 is smaller than or equal to BigDec Number2.
@@ -413,7 +308,7 @@ is_greater(#bigdec{exp = Exp},
 -spec is_smaller_or_equal(Number1 :: bigdec(), Number2 :: bigdec()) ->
                           Result :: true | false.
 is_smaller_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
-  is_equal(Num1, Num2) orelse is_smaller(Num1, Num2).
+  bigdec_comp:is_smaller_or_equal(Num1, Num2).
 
 %%-----------------------------------------------------------------------------
 %% @doc Validates if BigDec Number1 is greater than or equal to BigDec Number2.
@@ -422,98 +317,47 @@ is_smaller_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 -spec is_greater_or_equal(Number1 :: bigdec(), Number2 :: bigdec()) ->
                           Result :: true | false.
 is_greater_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
-  is_equal(Num1, Num2) orelse is_greater(Num1, Num2).
+  bigdec_comp:is_greater_or_equal(Num1, Num2).
 
-%%-----------------------------------------------------------------------------
-%% @doc Validates if bigdec has equivalent value of zero.
-%%
-%% Checks if bigdec can be precisely represented as zero number, this is
-%% validated by first stripping number, and than checking if value and exp are
-%% equivalent to zero.
+%%---------------------------------------------------------------------------------------------------------------------
+%% @doc Wrapper for bigdec_comp:is_zero/1.
+%% @see bigdec_comp:is_zero/1. Implementation at bigdec_comp module.
 %% @end
-%%-----------------------------------------------------------------------------
+%%---------------------------------------------------------------------------------------------------------------------
 -spec is_zero(Number :: bigdec()) -> Result :: true | false.
-is_zero(Num = #bigdec{}) ->
-  %% First we strip the number for later evaluation
-  #bigdec{value = Value, exp = Exp} = strip_zeros(Num),
-  Value == 0 andalso Exp == 0.
+is_zero(Num = #bigdec{}) -> bigdec_comp:is_zero(Num).
 
-%%-----------------------------------------------------------------------------
-%% @doc Validates if bigdec has equivalent value of one.
-%%
-%% Checks if bigdec can be precisely represented as number one, this is
-%% validated by first stripping number, and than checking if value is equal to
-%% one, sign equal to zero and exp equal to zero.
+%%---------------------------------------------------------------------------------------------------------------------
+%% @doc Wrapper for bigdec_comp:is_one/1.
+%% @see bigdec_comp:is_one/1. Implementation at bigdec_comp module.
 %% @end
-%%-----------------------------------------------------------------------------
+%%---------------------------------------------------------------------------------------------------------------------
 -spec is_one(Number :: bigdec()) -> Result :: true | false.
-is_one(Num = #bigdec{}) ->
-  %% First we strip the number for later evaluation
-  #bigdec{sign = Sign, value = Value, exp = Exp} = strip_zeros(Num),
-  Sign == 0 andalso Value == 1 andalso Exp == 0.
+is_one(Num = #bigdec{}) -> bigdec_comp:is_one(Num).
 
-%%-----------------------------------------------------------------------------
-%% @doc Validates if bigdec has equivalent value of ten.
-%%
-%% Checks if bigdec can be precisely represented as number ten, this is
-%% validated by first stripping number, and than checking if value is equal to
-%% ten, sign equal to zero and exp equal to zero.
+%%---------------------------------------------------------------------------------------------------------------------
+%% @doc Wrapper for bigdec_comp:is_ten/1.
+%% @see bigdec_comp:is_ten/1. Implementation at bigdec_comp module.
 %% @end
-%%-----------------------------------------------------------------------------
+%%---------------------------------------------------------------------------------------------------------------------
 -spec is_ten(Number :: bigdec()) -> Result :: true | false.
-is_ten(Num = #bigdec{}) ->
-  %% First we strip the number for later evaluation
-  #bigdec{sign = Sign, value = Value, exp = Exp} = strip_zeros(Num),
-  Sign == 0 andalso Value == 10 andalso Exp == 0.
+is_ten(Num = #bigdec{}) -> bigdec_comp:is_ten(Num).
 
-%%-----------------------------------------------------------------------------
-%% @doc Validates if the value contained in bigdec represents an integer.
-%%
-%% Checks if bigdec can be precisely represented as a simple integer, this is
-%% validated by check if exp is zero, and also if the amount of trailing zeros
-%% is equivalent to the exp value.
-%% Function does not use pattern is_* to avoid conflict with BIF is_integer.
+%%---------------------------------------------------------------------------------------------------------------------
+%% @doc Wrapper for bigdec_comp:contains_integer/1.
+%% @see bigdec_comp:contains_integer/1. Implementation at bigdec_comp module.
 %% @end
-%%-----------------------------------------------------------------------------
+%%---------------------------------------------------------------------------------------------------------------------
 -spec contains_integer(Number :: bigdec()) -> Result :: true | false.
-contains_integer(Num = #bigdec{exp = Exp}) ->
-  case Exp of
-    %% We have no decimal places in bigdec
-    0 -> true;
-    %% We have decimal places but we need to check trailing zeros
-    _ -> case has_trailing_zeros(Num) of
-           %% The amount of trailing zeros is equivalent to decimal places
-           {true, Exp} -> true;
-           %% Any other condition
-           _           -> false
-         end
-  end.
+contains_integer(Num = #bigdec{}) -> bigdec_comp:contains_integer(Num).
 
-%%-----------------------------------------------------------------------------
-%% @doc Compare two bigdec values and define what is the matching exponent.
-%%
-%% Calculates the common exponent among both bigdec data, but considers first
-%% stripping zeros if they exist. Returns the biggest exponent to be used by
-%% other functions for calculation, because we can increase exponent without
-%% losing precision of data, but not the other way around.
+%%---------------------------------------------------------------------------------------------------------------------
+%% @doc Wrapper for bigdec_comp:match_exp/2.
+%% @see bigdec_comp:match_exp/2. Implementation at bigdec_comp module.
 %% @end
-%%-----------------------------------------------------------------------------
--spec match_exp(Number1 :: bigdec(), Number2 :: bigdec()) ->
-                Result  :: {integer(), bigdec(), bigdec()}.
-match_exp(Num1 = #bigdec{},
-          Num2 = #bigdec{}) ->
-  %% Retrieve the stripped numbers for calculation
-  StrippedNum1 = #bigdec{value = Value1, exp = Exp1} = strip_zeros(Num1),
-  StrippedNum2 = #bigdec{value = Value2, exp = Exp2} = strip_zeros(Num2),
-  %% Returns the equalized numbers matching exp value
-  case Exp1 > Exp2 of
-    true  -> {Exp1, StrippedNum1,
-                    StrippedNum2#bigdec{value = Value2 * hlp_pow(10,Exp1-Exp2),
-                                        exp   = Exp1}};
-    false -> {Exp2, StrippedNum1#bigdec{value = Value1 * hlp_pow(10,Exp2-Exp1),
-                                        exp   = Exp2},
-                    StrippedNum2}
-  end.
+%%---------------------------------------------------------------------------------------------------------------------
+-spec match_exp(Number1 :: bigdec(), Number2 :: bigdec()) -> Result  :: {integer(), bigdec(), bigdec()}.
+match_exp(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:match_exp(Num1, Num2).
 
 %%=============================================================================
 %% Library public functions - Analysis
@@ -528,7 +372,7 @@ match_exp(Num1 = #bigdec{},
 %% @end
 %%----------------------------------------------------------------------------
 -spec exponent_val(Number :: bigdec()) -> Result :: integer().
-exponent_val(#bigdec{exp = Value}) -> Value.
+exponent_val(Num = #bigdec{}) -> bigdec_analysis:exponent_val(Num).
 
 %%-----------------------------------------------------------------------------
 %% @doc Value of unscaled integer representation not applying exponent power.
@@ -539,7 +383,7 @@ exponent_val(#bigdec{exp = Value}) -> Value.
 %% @end
 %%----------------------------------------------------------------------------
 -spec unscaled_val(Number :: bigdec()) -> Result :: non_neg_integer().
-unscaled_val(#bigdec{value = Value}) -> Value.
+unscaled_val(Num = #bigdec{}) -> bigdec_analysis:unscaled_val(Num).
 
 %%-----------------------------------------------------------------------------
 %% @doc Atom defining sign for bigdec.
@@ -551,9 +395,7 @@ unscaled_val(#bigdec{value = Value}) -> Value.
 %% @end
 %%----------------------------------------------------------------------------
 -spec sign_val(Number :: bigdec()) -> Result :: positive | negative | invalid.
-sign_val(#bigdec{sign = 0}) -> positive;
-sign_val(#bigdec{sign = 1}) -> negative;
-sign_val(#bigdec{sign = _}) -> invalid.
+sign_val(Num = #bigdec{}) -> bigdec_analysis:sign_val(Num).
 
 %%-----------------------------------------------------------------------------
 %% @doc Amount of digits of the unscaled valued for the bigdec, also known as
@@ -564,12 +406,10 @@ sign_val(#bigdec{sign = _}) -> invalid.
 %% @end
 %%----------------------------------------------------------------------------
 -spec precision_val(Number :: bigdec()) -> Result :: non_neg_integer().
-precision_val(#bigdec{value = Value}) ->
-  StringVal = integer_to_list(Value),
-  string:length(StringVal).
+precision_val(Num = #bigdec{}) -> bigdec_analysis:precision_val(Num).
 
 %%=============================================================================
-%% Library public functions - Constants
+%% Public API for bigdec_const module
 %%=============================================================================
 
 %%-----------------------------------------------------------------------------
@@ -577,21 +417,21 @@ precision_val(#bigdec{value = Value}) ->
 %% @end
 %%----------------------------------------------------------------------------
 -spec one() -> Result :: bigdec().
-one() -> #bigdec{sign = 0, value = 1, exp = 0}.
+one() -> bigdec_const:one().
 
 %%-----------------------------------------------------------------------------
 %% @doc Bigdec construct regarding value of zero when exponent is 0.
 %% @end
 %%----------------------------------------------------------------------------
 -spec zero() -> Result :: bigdec().
-zero() -> #bigdec{sign = 0, value = 0, exp = 0}.
+zero() -> bigdec_const:zero().
 
 %%-----------------------------------------------------------------------------
 %% @doc Bigdec construct regarding value of ten when exponent is 0.
 %% @end
 %%----------------------------------------------------------------------------
 -spec ten() -> Result :: bigdec().
-ten() -> #bigdec{sign = 0, value = 10, exp = 0}.
+ten() -> bigdec_const:ten().
 
 %%=============================================================================
 %% Internal Functions - Conversions
@@ -666,111 +506,6 @@ bitstring_processing(validate, Value) ->
   end.
 
 %%=============================================================================
-%% Internal Functions - Analysis
-%%
-%% This section provides utility internal functions to validate scenarios.
-%% Most of the functions starts with a corresponding questioning has_ is_ .
-%% These functions allows modular segmentation from more complex functions and
-%% reuse of common patterns.
-%%=============================================================================
-
-%%-----------------------------------------------------------------------------
-%% @doc Validates if values of bigdec has trailing zeros.
-%%
-%% Analyze bigdec value to check if it has trailing zeros. Since exp in our
-%% data structure is not supposed to be negative, we need to check also if
-%% the amount found of trailing zeros is bigger than our exp. It it is the
-%% amount to be return needs to be equal to exp. Also if the value of bigdec is
-%% equivalent to zero, we can't calculate the amount of trailing zeros so we
-%% need to return the exp as result for stripping.
-%% @end
-%%-----------------------------------------------------------------------------
--spec has_trailing_zeros(Number :: bigdec()) -> Result :: {true, Amount :: integer()}
-                                                        | {false,                  0}.
-has_trailing_zeros(#bigdec{value = Value, exp = Exp}) ->
-  Amount = howmany_trailing_zeros(Value, 0),
-  case Amount of
-    %% No trailing zeros were found
-    0        -> {false,     0};
-    %% BigDec value is equivalent to 0
-    infinity -> {true,    Exp};
-    %% We have trailing zeros, but need to compare with Exp to return smallest
-    _        -> case Amount > Exp of
-                  true  -> {true,    Exp};
-                  false -> {true, Amount}
-                end
-  end.
-
-%%-----------------------------------------------------------------------------
-%% @doc Calculate the maximum amount of trailing zeros found on the unscaled
-%% value of the bigdec.
-%%
-%% Use tail recursion to validate how many trailing zeros can be found, and
-%% returns the maximum amount of trailing zeros. If the value of bigdec is zero
-%% than we cant calculate the amount of trailing zeros, therefore we return the
-%% atom infinity, because the exp can be changed to zero as well without losing
-%% numeric precision.
-%% @end
-%%-----------------------------------------------------------------------------
--spec howmany_trailing_zeros(Number :: integer(), Acc :: integer()) ->
-                             Result :: non_neg_integer() | infinity.
-howmany_trailing_zeros(Value, Amount) when Value =/= 0,
-                                           is_integer(Value),
-                                           is_integer(Amount) ->
-  case Value rem (hlp_pow(10, Amount + 1)) == 0 of
-    true  -> howmany_trailing_zeros(Value, Amount + 1);
-    false -> Amount
-  end;
-howmany_trailing_zeros(Value, _) when Value == 0 -> infinity.
-
-
-%%=============================================================================
-%% Internal Functions - Utilities
-%%
-%% This section provides utility functions for common helper patterns that does
-%% not have direct connection with #bigdec{}.
-%%=============================================================================
-
-%%-----------------------------------------------------------------------------
-%% @doc Calculates exponentiation by squaring with big integers.
-%%
-%% Execute exponentiation of numbers, using recursive call of erlang pure ints,
-%% but it does not do fractional exponent, or count for negative exponent. At
-%% these cases it returns error.
-%% @end
-%%-----------------------------------------------------------------------------
--spec hlp_pow(Number   :: integer(),
-              Exponent :: non_neg_integer()) ->
-              Result   :: integer().
-hlp_pow(Number, Exponent) when is_integer(Number),
-                            is_integer(Exponent),
-                            Exponent >= 0         ->
-  hlp_pow(Number, Exponent, 1).
-
--spec hlp_pow(integer(), non_neg_integer(), integer()) -> integer().
-hlp_pow(  _,   0, Acc)                     -> Acc;
-hlp_pow(Num,   1, Acc)                     -> Acc*Num;
-hlp_pow(Num, Exp, Acc) when Exp rem 2 == 0 -> hlp_pow(Num*Num, Exp div 2,     Acc);
-hlp_pow(Num, Exp, Acc)                     -> hlp_pow(Num*Num, (Exp-1) div 2, Num*Acc).
-
-
-%%-----------------------------------------------------------------------------
-%% @doc Generates string containing leading zeros for formating.
-%%
-%% Based on amount of required leading zeros genetares string prepending zeros
-%% to original string and returns the new string.
-%% @end
-%%-----------------------------------------------------------------------------
--spec hlp_prepend_zeros(NumberString :: string(), LeadingZeros :: integer()) ->
-                        ResultString :: string().
-hlp_prepend_zeros(IntString, LeadingZeros) when LeadingZeros > 0 ->
-  lists:flatten(lists:duplicate(LeadingZeros, "0"))
-  ++ IntString;
-
-hlp_prepend_zeros(IntString, _) ->
-  IntString.
-
-%%=============================================================================
 %% EUnit Tests
 %%=============================================================================
 
@@ -821,189 +556,6 @@ minus_test() ->
                minus(#bigdec{sign = 1, value = 3745, exp = 2},
                      #bigdec{sign = 1, value =   32, exp = 0})).
 
-neg_test() ->
-  ?assertEqual(    #bigdec{sign = 0, value = 120394823, exp = 450},
-               neg(#bigdec{sign = 1, value = 120394823, exp = 450})),
-  ?assertEqual(    #bigdec{sign = 1, value = 35, exp = 10},
-               neg(#bigdec{sign = 0, value = 35, exp = 10})),
-  ?assertEqual(    #bigdec{sign =    0, value = 1, exp = 4},
-               neg(#bigdec{sign = '-1', value = 1, exp = 4})).
-
-strip_zeros_test() ->
-  ?assertEqual(            #bigdec{sign = 0, value =        34078, exp =  5},
-               strip_zeros(#bigdec{sign = 0, value = 340780000000, exp = 12})),
-  ?assertEqual(            #bigdec{sign = 1, value =    103, exp = 0},
-               strip_zeros(#bigdec{sign = 1, value = 103000, exp = 3})),
-  ?assertEqual(            #bigdec{sign = 0, value = 5001, exp = 12},
-               strip_zeros(#bigdec{sign = 0, value = 5001, exp = 12})).
-
-min_test() ->
-  ?assertEqual(           #bigdec{sign = 0, value = 5, exp = 2},
-               bigdec:min(#bigdec{sign = 0, value = 10, exp = 1},
-                          #bigdec{sign = 0, value =  5, exp = 2})).
-
-max_test() ->
-  ?assertEqual(           #bigdec{sign = 0, value = 10, exp = 1},
-               bigdec:max(#bigdec{sign = 0, value = 10, exp = 1},
-                          #bigdec{sign = 0, value =  5, exp = 2})).
-
-compare_test() ->
-  %% 0.55 against 0.55 -> equal
-  ?assertEqual(equal,   compare(#bigdec{sign = 0, value = 55, exp = 2},
-                               #bigdec{sign = 0, value = 55, exp = 2})),
-  %% 0.55 against -0.55 -> greater
-  ?assertEqual(greater, compare(#bigdec{sign = 0, value = 55, exp = 2},
-                                #bigdec{sign = 1, value = 55, exp = 2})),
-  %% 0.550 against 0.55 -> equal
-  ?assertEqual(equal,   compare(#bigdec{sign = 0, value = 550, exp = 3},
-                                #bigdec{sign = 0, value =  55, exp = 2})),
-  %% -0.500 against -0.50 -> equal
-  ?assertEqual(equal,   compare(#bigdec{sign = 1, value = 500, exp = 3},
-                                #bigdec{sign = 1, value =  50, exp = 2})),
-  %% 0.055 against 0.55 -> smaller
-  ?assertEqual(smaller, compare(#bigdec{sign = 0, value = 55, exp = 3},
-                                #bigdec{sign = 0, value = 55, exp = 2})),
-  %% -0.55 against 0.55 -> true
-  ?assertEqual(smaller, compare(#bigdec{sign = 1, value = 55, exp = 2},
-                                #bigdec{sign = 0, value = 55, exp = 2})),
-  %% -0.0500 against -0.50 -> greater
-  ?assertEqual(greater, compare(#bigdec{sign = 1, value = 500, exp = 4},
-                                #bigdec{sign = 1, value =  50, exp = 2})).
-
-is_equal_test() ->
-  %% 0.55 =:= 0.55 -> true
-  ?assertEqual(true,  is_equal(#bigdec{sign = 0, value = 55, exp = 2},
-                               #bigdec{sign = 0, value = 55, exp = 2})),
-  %% 0.55 =:= -0.55 -> false
-  ?assertEqual(false, is_equal(#bigdec{sign = 0, value = 55, exp = 2},
-                               #bigdec{sign = 1, value = 55, exp = 2})),
-  %% 0.550 =:= 0.55 -> true
-  ?assertEqual(true,  is_equal(#bigdec{sign = 0, value = 550, exp = 3},
-                               #bigdec{sign = 0, value =  55, exp = 2})),
-  %% -0.500 =:= -0.50 -> true
-  ?assertEqual(true,  is_equal(#bigdec{sign = 1, value = 500, exp = 3},
-                               #bigdec{sign = 1, value =  50, exp = 2})).
-
-is_smaller_test() ->
-  %% 0.055 < 0.55 -> true
-  ?assertEqual(true,  is_smaller(#bigdec{sign = 0, value = 55, exp = 3},
-                                 #bigdec{sign = 0, value = 55, exp = 2})),
-  %% 0.55 < 0.55 -> false
-  ?assertEqual(false, is_smaller(#bigdec{sign = 0, value = 55, exp = 2},
-                                 #bigdec{sign = 0, value = 55, exp = 2})),
-  %% -0.55 < 0.55 -> true
-  ?assertEqual(true,  is_smaller(#bigdec{sign = 1, value = 55, exp = 2},
-                                 #bigdec{sign = 0, value = 55, exp = 2})),
-  %% -0.0500 < -0.50 -> false
-  ?assertEqual(false, is_smaller(#bigdec{sign = 1, value = 500, exp = 4},
-                                 #bigdec{sign = 1, value =  50, exp = 2})).
-
-is_smaller_or_equal_test() ->
-  %% 0.055 < 0.55 -> true
-  ?assertEqual(true,  is_smaller_or_equal(#bigdec{sign = 0, value = 55, exp = 3},
-                                          #bigdec{sign = 0, value = 55, exp = 2})),
-  %% 0.55 < 0.55 -> false
-  ?assertEqual(true,  is_smaller_or_equal(#bigdec{sign = 0, value = 55, exp = 2},
-                                          #bigdec{sign = 0, value = 55, exp = 2})),
-  %% -0.55 < 0.55 -> true
-  ?assertEqual(true,  is_smaller_or_equal(#bigdec{sign = 1, value = 55, exp = 2},
-                                          #bigdec{sign = 0, value = 55, exp = 2})),
-  %% -0.0500 < -0.50 -> false
-  ?assertEqual(false, is_smaller_or_equal(#bigdec{sign = 1, value = 500, exp = 4},
-                                          #bigdec{sign = 1, value =  50, exp = 2})).
-
-is_greater_test() ->
-  %% 0.055 > 0.55 -> false
-  ?assertEqual(false, is_greater(#bigdec{sign = 0, value = 55, exp = 3},
-                                 #bigdec{sign = 0, value = 55, exp = 2})),
-  %% 0.55 > 0.55 -> false
-  ?assertEqual(false, is_greater(#bigdec{sign = 0, value = 55, exp = 2},
-                                 #bigdec{sign = 0, value = 55, exp = 2})),
-  %% -0.55 > 0.55 -> false
-  ?assertEqual(false, is_greater(#bigdec{sign = 1, value = 55, exp = 2},
-                                 #bigdec{sign = 0, value = 55, exp = 2})),
-  %% -0.0500 > -0.50 -> true
-  ?assertEqual(true,  is_greater(#bigdec{sign = 1, value = 500, exp = 4},
-                                 #bigdec{sign = 1, value =  50, exp = 2})).
-
-is_greater_or_equal_test() ->
-  %% 0.055 > 0.55 -> false
-  ?assertEqual(false, is_greater_or_equal(#bigdec{sign = 0, value = 55, exp = 3},
-                                          #bigdec{sign = 0, value = 55, exp = 2})),
-  %% 0.55 > 0.55 -> true
-  ?assertEqual(true, is_greater_or_equal(#bigdec{sign = 0, value = 55, exp = 2},
-                                         #bigdec{sign = 0, value = 55, exp = 2})),
-  %% -0.55 > 0.55 -> false
-  ?assertEqual(false, is_greater_or_equal(#bigdec{sign = 1, value = 55, exp = 2},
-                                          #bigdec{sign = 0, value = 55, exp = 2})),
-  %% -0.0500 > -0.50 -> true
-  ?assertEqual(true,  is_greater_or_equal(#bigdec{sign = 1, value = 500, exp = 4},
-                                          #bigdec{sign = 1, value =  50, exp = 2})).
-
-is_zero_test() ->
-  ?assertEqual(true,  is_zero(zero())),
-  ?assertEqual(true,  is_zero(#bigdec{sign = 1, value = 0, exp = 3})),
-  ?assertEqual(false, is_zero(one())).
-
-is_one_test() ->
-  ?assertEqual(true,  is_one(one())),
-  ?assertEqual(true,  is_one(#bigdec{sign = 0, value = 1000, exp = 3})),
-  ?assertEqual(false, is_one(#bigdec{sign = 0, value = 1000, exp = 2})),
-  ?assertEqual(false, is_one(#bigdec{sign = 1, value = 1000, exp = 3})),
-  ?assertEqual(false, is_one(zero())).
-
-is_ten_test() ->
-  ?assertEqual(true,  is_ten(ten())),
-  ?assertEqual(true,  is_ten(#bigdec{sign = 0, value = 1000, exp = 2})),
-  ?assertEqual(false, is_ten(#bigdec{sign = 0, value = 1000, exp = 1})),
-  ?assertEqual(false, is_ten(#bigdec{sign = 1, value = 1000, exp = 2})),
-  ?assertEqual(false, is_ten(one())).
-
-contains_integer_test() ->
-  ?assertEqual(true,  contains_integer(#bigdec{sign = 1, value =   3, exp = 0})),
-  ?assertEqual(false, contains_integer(#bigdec{sign = 1, value =   3, exp = 3})),
-  ?assertEqual(true,  contains_integer(#bigdec{sign = 0, value = 200, exp = 2})),
-  ?assertEqual(true,  contains_integer( one())),
-  ?assertEqual(true,  contains_integer(zero())),
-  ?assertEqual(true,  contains_integer( ten())).
-
-match_exp_test() ->
-  ?assertEqual({3, #bigdec{value =  10000, exp=3},
-                   #bigdec{value =      5, exp=3}}, match_exp(ten(),
-                                                              #bigdec{value =   5, exp = 3})),
-  ?assertEqual({5, #bigdec{value = 100000, exp=5},
-                   #bigdec{value =      5, exp=5}}, match_exp(one(),
-                                                              #bigdec{value = 500, exp = 7})),
-  ?assertEqual({1, #bigdec{value =     20, exp=1},
-                   #bigdec{value =      1, exp=1}}, match_exp(#bigdec{value =   2, exp = 0},
-                                                              #bigdec{value =   1, exp = 1})).
-
-exponent_val_test() ->
-  ?assertEqual(10,  exponent_val(#bigdec{sign = 0, value = 0, exp =  10})),
-  ?assertEqual(302, exponent_val(#bigdec{sign = 0, value = 0, exp = 302})).
-
-unscaled_val_test() ->
-  ?assertEqual(9233498374981274897489178971489374,
-               unscaled_val(#bigdec{sign = 0,
-                                    value = 9233498374981274897489178971489374,
-                                    exp = 10})),
-  ?assertEqual(9230000000000000000000000000000000,
-               unscaled_val(#bigdec{sign = 0,
-                                    value = 9230000000000000000000000000000000,
-                                    exp = 10})).
-
-sign_val_test() ->
-  ?assertEqual(positive, sign_val(#bigdec{sign =  0, value = 0, exp = 0})),
-  ?assertEqual(positive, sign_val(#bigdec{sign =  0, value = 1, exp = 0})),
-  ?assertEqual(negative, sign_val(#bigdec{sign =  1, value = 1, exp = 0})),
-  ?assertEqual(invalid,  sign_val(#bigdec{sign = -1, value = 1, exp = 0})),
-  ?assertEqual(invalid,  sign_val(#bigdec{sign = '0', value = 0, exp = 0})).
-
-precision_val_test() ->
-  ?assertEqual(10, precision_val(#bigdec{sign = 0, value = 1483495837, exp = 5})),
-  ?assertEqual( 3, precision_val(#bigdec{sign = 0, value =        222, exp = 5})),
-  ?assertEqual( 1, precision_val(#bigdec{sign = 0, value =          0, exp = 0})).
-
 float_to_bitstring_test() ->
   ?assertEqual(<<"2.20000000000000">>, float_to_bitstring(2.2)),
   ?assertEqual(<<"12232183219874.23400000000000">>, float_to_bitstring(12232183219874.2345672345)),
@@ -1019,16 +571,5 @@ bitstring_processing_test() ->
   ?assertEqual(invalid, bitstring_processing(validate, <<"j12e30">>)),
   ?assertEqual(invalid, bitstring_processing(validate, <<"1234.3e50K">>)),
   ?assertEqual(invalid, bitstring_processing(validate, <<"1234A.934">>)).
-
-has_trailing_zeros_test() ->
-  ?assertEqual({true,  3}, has_trailing_zeros(#bigdec{value =       1000, exp = 10})),
-  ?assertEqual({true,  3}, has_trailing_zeros(#bigdec{value =      -1000, exp = 10})),
-  ?assertEqual({false, 0}, has_trailing_zeros(#bigdec{value = 4392345897, exp = 50})).
-
-pow_test() ->
-  ?assertEqual(25,                              hlp_pow(-5,   2)),
-  ?assertEqual(4261655511456885005249781170176, hlp_pow(34,  20)),
-  ?assertError(function_clause,                 hlp_pow(10, 0.5)),
-  ?assertError(function_clause,                 hlp_pow(10,  -2)).
 
 -endif.
