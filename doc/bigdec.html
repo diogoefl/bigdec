@@ -41,12 +41,23 @@
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add-2">add/2</a></td><td>Add two bigdec numbers by matching scale if necessary.</td></tr>
 <tr><td valign="top"><a href="#as_text-1">as_text/1</a></td><td>Convert bigdec representation as text.</td></tr>
+<tr><td valign="top"><a href="#compare-2">compare/2</a></td><td>Compares BigDec Number1 with BigDec Number2 and returns atom defining
+  if Number1 is equal, greater or smaller than Number2.</td></tr>
 <tr><td valign="top"><a href="#contains_integer-1">contains_integer/1</a></td><td>Validates if the value contained in bigdec represents an integer.</td></tr>
 <tr><td valign="top"><a href="#exponent_val-1">exponent_val/1</a></td><td>Value of exponent in bigdec number.</td></tr>
+<tr><td valign="top"><a href="#is_equal-2">is_equal/2</a></td><td>Verifies if both bigdec numbers have equal numerical values.</td></tr>
+<tr><td valign="top"><a href="#is_greater-2">is_greater/2</a></td><td>Verifies if first argument is greater than second argument.</td></tr>
+<tr><td valign="top"><a href="#is_greater_or_equal-2">is_greater_or_equal/2</a></td><td>Validates if BigDec Number1 is greater than or equal to BigDec Number2.</td></tr>
 <tr><td valign="top"><a href="#is_one-1">is_one/1</a></td><td>Validates if bigdec has equivalent value of one.</td></tr>
+<tr><td valign="top"><a href="#is_smaller-2">is_smaller/2</a></td><td>Verifies if first argument is smaller than second argument.</td></tr>
+<tr><td valign="top"><a href="#is_smaller_or_equal-2">is_smaller_or_equal/2</a></td><td>Validates if BigDec Number1 is smaller than or equal to BigDec Number2.</td></tr>
 <tr><td valign="top"><a href="#is_ten-1">is_ten/1</a></td><td>Validates if bigdec has equivalent value of ten.</td></tr>
 <tr><td valign="top"><a href="#is_zero-1">is_zero/1</a></td><td>Validates if bigdec has equivalent value of zero.</td></tr>
 <tr><td valign="top"><a href="#match_exp-2">match_exp/2</a></td><td>Compare two bigdec values and define what is the matching exponent.</td></tr>
+<tr><td valign="top"><a href="#max-2">max/2</a></td><td>Returns which of the two BigDec Numbers is the greatest in value, and
+  if they are both equals, return first argument.</td></tr>
+<tr><td valign="top"><a href="#min-2">min/2</a></td><td>Returns which of the two BigDec Numbers is the smallest in value, and
+  if they are both equals, return first argument.</td></tr>
 <tr><td valign="top"><a href="#minus-2">minus/2</a></td><td>Subtracts two bigdec numbers by matching scale if necessary.</td></tr>
 <tr><td valign="top"><a href="#neg-1">neg/1</a></td><td>Negate bigdec changing its sign from 0 to 1 or vice-versa.</td></tr>
 <tr><td valign="top"><a href="#one-0">one/0</a></td><td>Bigdec construct regarding value of one when exponent is 0.</td></tr>
@@ -78,6 +89,12 @@ precision of bigdec.</td></tr>
   Using calculation of Value * (Sign * -1) * 10 ^ Exp return the format of a
   bitstring representing the bigdec data.</p>
 
+<h3 class="function"><a name="compare-2">compare/2</a></h3>
+<div class="spec">
+<p><tt>compare(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::equal | greater | smaller</tt><br></p>
+</div><p>Compares BigDec Number1 with BigDec Number2 and returns atom defining
+  if Number1 is equal, greater or smaller than Number2.</p>
+
 <h3 class="function"><a name="contains_integer-1">contains_integer/1</a></h3>
 <div class="spec">
 <p><tt>contains_integer(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
@@ -97,6 +114,26 @@ precision of bigdec.</td></tr>
   Exponent value in bigdec is neg against the representation, meaning that for
   example 0.2 is represented as (2 * 10 ^ -1) and the exponent value is +1.</p>
 
+<h3 class="function"><a name="is_equal-2">is_equal/2</a></h3>
+<div class="spec">
+<p><tt>is_equal(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
+</div><p><p>Verifies if both bigdec numbers have equal numerical values.</p>
+ 
+  Checks if bigdec can be precisely represent the same value as the other, and
+  if they don't match em exponent value, recheck by matching exponents.</p>
+
+<h3 class="function"><a name="is_greater-2">is_greater/2</a></h3>
+<div class="spec">
+<p><tt>is_greater(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
+</div><p><p>Verifies if first argument is greater than second argument.</p>
+ 
+  Checks if bigdec Number1 represents a numeric value greater than Number2.</p>
+
+<h3 class="function"><a name="is_greater_or_equal-2">is_greater_or_equal/2</a></h3>
+<div class="spec">
+<p><tt>is_greater_or_equal(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
+</div><p>Validates if BigDec Number1 is greater than or equal to BigDec Number2.</p>
+
 <h3 class="function"><a name="is_one-1">is_one/1</a></h3>
 <div class="spec">
 <p><tt>is_one(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
@@ -105,6 +142,18 @@ precision of bigdec.</td></tr>
   Checks if bigdec can be precisely represented as number one, this is
   validated by first stripping number, and than checking if value is equal to
   one, sign equal to zero and exp equal to zero.</p>
+
+<h3 class="function"><a name="is_smaller-2">is_smaller/2</a></h3>
+<div class="spec">
+<p><tt>is_smaller(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
+</div><p><p>Verifies if first argument is smaller than second argument.</p>
+ 
+  Checks if bigdec Number1 represents a numeric value smaller than Number2.</p>
+
+<h3 class="function"><a name="is_smaller_or_equal-2">is_smaller_or_equal/2</a></h3>
+<div class="spec">
+<p><tt>is_smaller_or_equal(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
+</div><p>Validates if BigDec Number1 is smaller than or equal to BigDec Number2.</p>
 
 <h3 class="function"><a name="is_ten-1">is_ten/1</a></h3>
 <div class="spec">
@@ -133,6 +182,18 @@ precision of bigdec.</td></tr>
   stripping zeros if they exist. Returns the biggest exponent to be used by
   other functions for calculation, because we can increase exponent without
   losing precision of data, but not the other way around.</p>
+
+<h3 class="function"><a name="max-2">max/2</a></h3>
+<div class="spec">
+<p><tt>max(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; MaxValue::<a href="#type-bigdec">bigdec()</a></tt><br></p>
+</div><p>Returns which of the two BigDec Numbers is the greatest in value, and
+  if they are both equals, return first argument.</p>
+
+<h3 class="function"><a name="min-2">min/2</a></h3>
+<div class="spec">
+<p><tt>min(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; MinValue::<a href="#type-bigdec">bigdec()</a></tt><br></p>
+</div><p>Returns which of the two BigDec Numbers is the smallest in value, and
+  if they are both equals, return first argument.</p>
 
 <h3 class="function"><a name="minus-2">minus/2</a></h3>
 <div class="spec">

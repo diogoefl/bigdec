@@ -57,7 +57,9 @@
 -export([neg/1, strip_zeros/1]).
 
 %% Comparison
--export([is_zero/1, is_one/1, is_ten/1, contains_integer/1, match_exp/2]).
+-export([min/2, max/2, compare/2, is_smaller_or_equal/2, is_greater_or_equal/2,
+         is_equal/2, is_smaller/2, is_greater/2, is_zero/1, is_one/1, is_ten/1,
+         contains_integer/1, match_exp/2]).
 
 %% Analysis
 -export([exponent_val/1, unscaled_val/1, sign_val/1, precision_val/1]).
@@ -254,12 +256,14 @@ strip_zeros(Num = #bigdec{value = Value, exp = Exp}) ->
 %%
 %% Planned functions to be implemented
 %% => Comparisons
-%% max(#bigdec{}, #bigdec{})        -> #bigdec{}
-%% min(#bigdec{}, #bigdec{})        -> #bigdec{}
-%% compare(#bigdec{}, #bigdec{})    -> equal | greater | smaller
-%% is_greater(#bigdec{}, #bigdec{}) -> true | false
-%% is_equal(#bigdec{}, #bigdec{})   -> true | false
-%% is_smaller(#bigdec{}, #bigdec{}) -> true | false
+%% max(#bigdec{}, #bigdec{})        -> #bigdec{} (DONE)
+%% min(#bigdec{}, #bigdec{})        -> #bigdec{} (DONE)
+%% compare(#bigdec{}, #bigdec{})    -> equal | greater | smaller (DONE)
+%% is_equal(#bigdec{}, #bigdec{})   -> true | false (DONE)
+%% is_smaller(#bigdec{}, #bigdec{}) -> true | false (DONE)
+%% is_greater(#bigdec{}, #bigdec{}) -> true | false (DONE)
+%% is_smaller_or_equal(#bigdec{}, #bigdec{}) -> true | false (DONE)
+%% is_greater_or_equal(#bigdec{}, #bigdec{}) -> true | false (DONE)
 %% is_zero(#bigdec{})               -> true | false (DONE)
 %% is_one(#bigdec{})                -> true | false (DONE)
 %% is_ten(#bigdec{})                -> true | false (DONE)
@@ -267,6 +271,158 @@ strip_zeros(Num = #bigdec{value = Value, exp = Exp}) ->
 %% match_exp(#bigdec{}, #bigdec{})  -> integer() (DONE)
 %%
 %%=============================================================================
+
+%%-----------------------------------------------------------------------------
+%% @doc Returns which of the two BigDec Numbers is the greatest in value, and
+%% if they are both equals, return first argument.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec max(Number1 :: bigdec(), Number2 :: bigdec()) -> MaxValue :: bigdec().
+max(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
+  case is_greater_or_equal(Num1, Num2) of
+    true  -> Num1;
+    false -> Num2
+  end.
+
+%%-----------------------------------------------------------------------------
+%% @doc Returns which of the two BigDec Numbers is the smallest in value, and
+%% if they are both equals, return first argument.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec min(Number1 :: bigdec(), Number2 :: bigdec()) -> MinValue :: bigdec().
+min(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
+  case is_smaller_or_equal(Num1, Num2) of
+    true  -> Num1;
+    false -> Num2
+  end.
+
+%%-----------------------------------------------------------------------------
+%% @doc Compares BigDec Number1 with BigDec Number2 and returns atom defining
+%% if Number1 is equal, greater or smaller than Number2.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec compare(Number1 :: bigdec(), Number2 :: bigdec()) ->
+              Result :: equal | greater | smaller.
+compare(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
+  case is_equal(Num1, Num2) of
+    true  -> equal;
+    false -> case is_smaller(Num1, Num2) of
+               true  -> smaller;
+               false -> greater
+             end
+  end.
+
+%%-----------------------------------------------------------------------------
+%% @doc Verifies if both bigdec numbers have equal numerical values.
+%%
+%% Checks if bigdec can be precisely represent the same value as the other, and
+%% if they don't match em exponent value, recheck by matching exponents.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec is_equal(Number1 :: bigdec(),
+               Number2 :: bigdec()) ->
+               Result  :: true | false.
+%% They don't match in exponent - recalculate matching exponents for comparison
+is_equal(Num1 = #bigdec{exp = Exp1},
+         Num2 = #bigdec{exp = Exp2}) when Exp1 =/= Exp2 ->
+  {_, MatchingNum1, MatchingNum2} = match_exp(Num1, Num2),
+  is_equal(MatchingNum1, MatchingNum2);
+
+%% Both have the same sign, value and exponent
+is_equal(#bigdec{sign = Sign, value = Value, exp = Exp},
+         #bigdec{sign = Sign, value = Value, exp = Exp}) -> true;
+
+%% Any other case when matching exponents means they are not equals
+is_equal(#bigdec{exp = Exp},
+         #bigdec{exp = Exp}) -> false.
+
+%%-----------------------------------------------------------------------------
+%% @doc Verifies if first argument is smaller than second argument.
+%%
+%% Checks if bigdec Number1 represents a numeric value smaller than Number2.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec is_smaller(Number1 :: bigdec(),
+                 Number2 :: bigdec()) ->
+                 Result  :: true | false.
+%% They don't match in exponent - recalculate matching exponents for comparison
+is_smaller(Num1 = #bigdec{exp = Exp1},
+           Num2 = #bigdec{exp = Exp2}) when Exp1 =/= Exp2 ->
+  {_, MatchingNum1, MatchingNum2} = match_exp(Num1, Num2),
+  is_smaller(MatchingNum1, MatchingNum2);
+
+%% Both are positive and exponent is equal, than we can compare values
+is_smaller(#bigdec{sign = 0, value = Val1, exp = Exp},
+           #bigdec{sign = 0, value = Val2, exp = Exp}) when Val1 < Val2 ->
+  true;
+
+%% Both are negative and exponent is equal, than we can compare values
+is_smaller(#bigdec{sign = 1, value = Val1, exp = Exp},
+           #bigdec{sign = 1, value = Val2, exp = Exp}) when Val1 > Val2 ->
+  true;
+
+%% Num1 is negative and Num2 is positive and exponent is equal, we don't need
+%% to check the values because a negative number will always be smaller
+is_smaller(#bigdec{sign = 1, exp = Exp},
+           #bigdec{sign = 0, exp = Exp}) ->
+  true;
+
+%% Any other case when matching exponents means Num1 is not smaller than Num2
+is_smaller(#bigdec{exp = Exp},
+           #bigdec{exp = Exp}) -> false.
+
+%%-----------------------------------------------------------------------------
+%% @doc Verifies if first argument is greater than second argument.
+%%
+%% Checks if bigdec Number1 represents a numeric value greater than Number2.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec is_greater(Number1 :: bigdec(),
+                 Number2 :: bigdec()) ->
+                 Result  :: true | false.
+%% They don't match in exponent - recalculate matching exponents for comparison
+is_greater(Num1 = #bigdec{exp = Exp1},
+           Num2 = #bigdec{exp = Exp2}) when Exp1 =/= Exp2 ->
+  {_, MatchingNum1, MatchingNum2} = match_exp(Num1, Num2),
+  is_greater(MatchingNum1, MatchingNum2);
+
+%% Both are positive and exponent is equal, than we can compare values
+is_greater(#bigdec{sign = 0, value = Val1, exp = Exp},
+           #bigdec{sign = 0, value = Val2, exp = Exp}) when Val1 > Val2 ->
+  true;
+
+%% Both are negative and exponent is equal, than we can compare values
+is_greater(#bigdec{sign = 1, value = Val1, exp = Exp},
+           #bigdec{sign = 1, value = Val2, exp = Exp}) when Val1 < Val2 ->
+  true;
+
+%% Num1 is positive and Num2 is negative and exponent is equal, we don't need
+%% to check the values because a negative number will always be smaller
+is_greater(#bigdec{sign = 0, exp = Exp},
+           #bigdec{sign = 1, exp = Exp}) ->
+  true;
+
+%% Any other case when matching exponents means Num1 is not greater than Num2
+is_greater(#bigdec{exp = Exp},
+           #bigdec{exp = Exp}) -> false.
+
+%%-----------------------------------------------------------------------------
+%% @doc Validates if BigDec Number1 is smaller than or equal to BigDec Number2.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec is_smaller_or_equal(Number1 :: bigdec(), Number2 :: bigdec()) ->
+                          Result :: true | false.
+is_smaller_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
+  is_equal(Num1, Num2) orelse is_smaller(Num1, Num2).
+
+%%-----------------------------------------------------------------------------
+%% @doc Validates if BigDec Number1 is greater than or equal to BigDec Number2.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec is_greater_or_equal(Number1 :: bigdec(), Number2 :: bigdec()) ->
+                          Result :: true | false.
+is_greater_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
+  is_equal(Num1, Num2) orelse is_greater(Num1, Num2).
 
 %%-----------------------------------------------------------------------------
 %% @doc Validates if bigdec has equivalent value of zero.
@@ -680,6 +836,109 @@ strip_zeros_test() ->
                strip_zeros(#bigdec{sign = 1, value = 103000, exp = 3})),
   ?assertEqual(            #bigdec{sign = 0, value = 5001, exp = 12},
                strip_zeros(#bigdec{sign = 0, value = 5001, exp = 12})).
+
+min_test() ->
+  ?assertEqual(           #bigdec{sign = 0, value = 5, exp = 2},
+               bigdec:min(#bigdec{sign = 0, value = 10, exp = 1},
+                          #bigdec{sign = 0, value =  5, exp = 2})).
+
+max_test() ->
+  ?assertEqual(           #bigdec{sign = 0, value = 10, exp = 1},
+               bigdec:max(#bigdec{sign = 0, value = 10, exp = 1},
+                          #bigdec{sign = 0, value =  5, exp = 2})).
+
+compare_test() ->
+  %% 0.55 against 0.55 -> equal
+  ?assertEqual(equal,   compare(#bigdec{sign = 0, value = 55, exp = 2},
+                               #bigdec{sign = 0, value = 55, exp = 2})),
+  %% 0.55 against -0.55 -> greater
+  ?assertEqual(greater, compare(#bigdec{sign = 0, value = 55, exp = 2},
+                                #bigdec{sign = 1, value = 55, exp = 2})),
+  %% 0.550 against 0.55 -> equal
+  ?assertEqual(equal,   compare(#bigdec{sign = 0, value = 550, exp = 3},
+                                #bigdec{sign = 0, value =  55, exp = 2})),
+  %% -0.500 against -0.50 -> equal
+  ?assertEqual(equal,   compare(#bigdec{sign = 1, value = 500, exp = 3},
+                                #bigdec{sign = 1, value =  50, exp = 2})),
+  %% 0.055 against 0.55 -> smaller
+  ?assertEqual(smaller, compare(#bigdec{sign = 0, value = 55, exp = 3},
+                                #bigdec{sign = 0, value = 55, exp = 2})),
+  %% -0.55 against 0.55 -> true
+  ?assertEqual(smaller, compare(#bigdec{sign = 1, value = 55, exp = 2},
+                                #bigdec{sign = 0, value = 55, exp = 2})),
+  %% -0.0500 against -0.50 -> greater
+  ?assertEqual(greater, compare(#bigdec{sign = 1, value = 500, exp = 4},
+                                #bigdec{sign = 1, value =  50, exp = 2})).
+
+is_equal_test() ->
+  %% 0.55 =:= 0.55 -> true
+  ?assertEqual(true,  is_equal(#bigdec{sign = 0, value = 55, exp = 2},
+                               #bigdec{sign = 0, value = 55, exp = 2})),
+  %% 0.55 =:= -0.55 -> false
+  ?assertEqual(false, is_equal(#bigdec{sign = 0, value = 55, exp = 2},
+                               #bigdec{sign = 1, value = 55, exp = 2})),
+  %% 0.550 =:= 0.55 -> true
+  ?assertEqual(true,  is_equal(#bigdec{sign = 0, value = 550, exp = 3},
+                               #bigdec{sign = 0, value =  55, exp = 2})),
+  %% -0.500 =:= -0.50 -> true
+  ?assertEqual(true,  is_equal(#bigdec{sign = 1, value = 500, exp = 3},
+                               #bigdec{sign = 1, value =  50, exp = 2})).
+
+is_smaller_test() ->
+  %% 0.055 < 0.55 -> true
+  ?assertEqual(true,  is_smaller(#bigdec{sign = 0, value = 55, exp = 3},
+                                 #bigdec{sign = 0, value = 55, exp = 2})),
+  %% 0.55 < 0.55 -> false
+  ?assertEqual(false, is_smaller(#bigdec{sign = 0, value = 55, exp = 2},
+                                 #bigdec{sign = 0, value = 55, exp = 2})),
+  %% -0.55 < 0.55 -> true
+  ?assertEqual(true,  is_smaller(#bigdec{sign = 1, value = 55, exp = 2},
+                                 #bigdec{sign = 0, value = 55, exp = 2})),
+  %% -0.0500 < -0.50 -> false
+  ?assertEqual(false, is_smaller(#bigdec{sign = 1, value = 500, exp = 4},
+                                 #bigdec{sign = 1, value =  50, exp = 2})).
+
+is_smaller_or_equal_test() ->
+  %% 0.055 < 0.55 -> true
+  ?assertEqual(true,  is_smaller_or_equal(#bigdec{sign = 0, value = 55, exp = 3},
+                                          #bigdec{sign = 0, value = 55, exp = 2})),
+  %% 0.55 < 0.55 -> false
+  ?assertEqual(true,  is_smaller_or_equal(#bigdec{sign = 0, value = 55, exp = 2},
+                                          #bigdec{sign = 0, value = 55, exp = 2})),
+  %% -0.55 < 0.55 -> true
+  ?assertEqual(true,  is_smaller_or_equal(#bigdec{sign = 1, value = 55, exp = 2},
+                                          #bigdec{sign = 0, value = 55, exp = 2})),
+  %% -0.0500 < -0.50 -> false
+  ?assertEqual(false, is_smaller_or_equal(#bigdec{sign = 1, value = 500, exp = 4},
+                                          #bigdec{sign = 1, value =  50, exp = 2})).
+
+is_greater_test() ->
+  %% 0.055 > 0.55 -> false
+  ?assertEqual(false, is_greater(#bigdec{sign = 0, value = 55, exp = 3},
+                                 #bigdec{sign = 0, value = 55, exp = 2})),
+  %% 0.55 > 0.55 -> false
+  ?assertEqual(false, is_greater(#bigdec{sign = 0, value = 55, exp = 2},
+                                 #bigdec{sign = 0, value = 55, exp = 2})),
+  %% -0.55 > 0.55 -> false
+  ?assertEqual(false, is_greater(#bigdec{sign = 1, value = 55, exp = 2},
+                                 #bigdec{sign = 0, value = 55, exp = 2})),
+  %% -0.0500 > -0.50 -> true
+  ?assertEqual(true,  is_greater(#bigdec{sign = 1, value = 500, exp = 4},
+                                 #bigdec{sign = 1, value =  50, exp = 2})).
+
+is_greater_or_equal_test() ->
+  %% 0.055 > 0.55 -> false
+  ?assertEqual(false, is_greater_or_equal(#bigdec{sign = 0, value = 55, exp = 3},
+                                          #bigdec{sign = 0, value = 55, exp = 2})),
+  %% 0.55 > 0.55 -> true
+  ?assertEqual(true, is_greater_or_equal(#bigdec{sign = 0, value = 55, exp = 2},
+                                         #bigdec{sign = 0, value = 55, exp = 2})),
+  %% -0.55 > 0.55 -> false
+  ?assertEqual(false, is_greater_or_equal(#bigdec{sign = 1, value = 55, exp = 2},
+                                          #bigdec{sign = 0, value = 55, exp = 2})),
+  %% -0.0500 > -0.50 -> true
+  ?assertEqual(true,  is_greater_or_equal(#bigdec{sign = 1, value = 500, exp = 4},
+                                          #bigdec{sign = 1, value =  50, exp = 2})).
 
 is_zero_test() ->
   ?assertEqual(true,  is_zero(zero())),
