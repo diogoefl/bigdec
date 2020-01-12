@@ -10,7 +10,7 @@
 <hr>
 
 <h1>Module bigdec_transform</h1>
-<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Arbitrary Precision Decimal Transform functions.
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Arbitrary Precision Decimal Transform functions.
 <p>Copyright © (diogoefl) 2020. All Rights Reserved.
   
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,15 +31,6 @@
 <h2><a name="description">Description</a></h2><p>Arbitrary Precision Decimal Transform functions.</p>
   
    Defines modifications and transformations of bigdec.
-<h2><a name="types">Data Types</a></h2>
-
-<h3 class="typedecl"><a name="type-bigdec">bigdec()</a></h3>
-<p><tt>bigdec() = #bigdec{sign = 0 | 1, value = non_neg_integer(), exp = non_neg_integer()}</tt></p>
-<p>  bigdec() defines tuple object representing a BigDec number. The data
-  structure of bigdec is formed by 3 elements: sign, integer value and
-  exponent. These three elements form the definition of the number based on
-  the following formula: (Sign * -1) * IntValue * (10 ^ Exp).</p>
-
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#neg-1">neg/1</a></td><td>Negate bigdec changing its sign from 0 to 1 or vice-versa.</td></tr>
 <tr><td valign="top"><a href="#strip_zeros-1">strip_zeros/1</a></td><td>Strip possible trailing zeros in bigdec number.</td></tr>
@@ -49,7 +40,7 @@
 
 <h3 class="function"><a name="neg-1">neg/1</a></h3>
 <div class="spec">
-<p><tt>neg(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
+<p><tt>neg(Number::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>) -&gt; Result::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a></tt><br></p>
 </div><p><p>Negate bigdec changing its sign from 0 to 1 or vice-versa.</p>
  
   If sign defined in bigdec is invalid (different from 0 or 1), we return a
@@ -57,7 +48,7 @@
 
 <h3 class="function"><a name="strip_zeros-1">strip_zeros/1</a></h3>
 <div class="spec">
-<p><tt>strip_zeros(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
+<p><tt>strip_zeros(Number::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>) -&gt; Result::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a></tt><br></p>
 </div><p><p>Strip possible trailing zeros in bigdec number.</p>
  
   If there is any trailing zero, returns a new bigdec with stripped zeros from

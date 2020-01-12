@@ -31,13 +31,6 @@
 %%=============================================================================
 
 -include("bigdec.hrl").
--type     bigdec() :: #bigdec{sign  :: 0 | 1,
-                              value :: non_neg_integer(),
-                              exp   :: non_neg_integer()}.
-%% bigdec() defines tuple object representing a BigDec number. The data
-%% structure of bigdec is formed by 3 elements: sign, integer value and
-%% exponent. These three elements form the definition of the number based on
-%% the following formula: (Sign * -1) * IntValue * (10 ^ Exp).
 
 %%=============================================================================
 %% Module setup
@@ -82,7 +75,7 @@
 %% if they are both equals, return first argument.
 %% @end
 %%-----------------------------------------------------------------------------
--spec max(Number1 :: bigdec(), Number2 :: bigdec()) -> MaxValue :: bigdec().
+-spec max(Number1 :: bigdec:bigdec(), Number2 :: bigdec:bigdec()) -> MaxValue :: bigdec:bigdec().
 max(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
   case is_greater_or_equal(Num1, Num2) of
     true  -> Num1;
@@ -94,7 +87,7 @@ max(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 %% if they are both equals, return first argument.
 %% @end
 %%-----------------------------------------------------------------------------
--spec min(Number1 :: bigdec(), Number2 :: bigdec()) -> MinValue :: bigdec().
+-spec min(Number1 :: bigdec:bigdec(), Number2 :: bigdec:bigdec()) -> MinValue :: bigdec:bigdec().
 min(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
   case is_smaller_or_equal(Num1, Num2) of
     true  -> Num1;
@@ -106,7 +99,7 @@ min(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 %% if Number1 is equal, greater or smaller than Number2.
 %% @end
 %%-----------------------------------------------------------------------------
--spec compare(Number1 :: bigdec(), Number2 :: bigdec()) ->
+-spec compare(Number1 :: bigdec:bigdec(), Number2 :: bigdec:bigdec()) ->
               Result :: equal | greater | smaller.
 compare(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
   case is_equal(Num1, Num2) of
@@ -124,8 +117,8 @@ compare(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 %% if they don't match em exponent value, recheck by matching exponents.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_equal(Number1 :: bigdec(),
-               Number2 :: bigdec()) ->
+-spec is_equal(Number1 :: bigdec:bigdec(),
+               Number2 :: bigdec:bigdec()) ->
                Result  :: true | false.
 %% They don't match in exponent - recalculate matching exponents for comparison
 is_equal(Num1 = #bigdec{exp = Exp1},
@@ -147,8 +140,8 @@ is_equal(#bigdec{exp = Exp},
 %% Checks if bigdec Number1 represents a numeric value smaller than Number2.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_smaller(Number1 :: bigdec(),
-                 Number2 :: bigdec()) ->
+-spec is_smaller(Number1 :: bigdec:bigdec(),
+                 Number2 :: bigdec:bigdec()) ->
                  Result  :: true | false.
 %% They don't match in exponent - recalculate matching exponents for comparison
 is_smaller(Num1 = #bigdec{exp = Exp1},
@@ -182,8 +175,8 @@ is_smaller(#bigdec{exp = Exp},
 %% Checks if bigdec Number1 represents a numeric value greater than Number2.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_greater(Number1 :: bigdec(),
-                 Number2 :: bigdec()) ->
+-spec is_greater(Number1 :: bigdec:bigdec(),
+                 Number2 :: bigdec:bigdec()) ->
                  Result  :: true | false.
 %% They don't match in exponent - recalculate matching exponents for comparison
 is_greater(Num1 = #bigdec{exp = Exp1},
@@ -215,7 +208,7 @@ is_greater(#bigdec{exp = Exp},
 %% @doc Validates if BigDec Number1 is smaller than or equal to BigDec Number2.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_smaller_or_equal(Number1 :: bigdec(), Number2 :: bigdec()) ->
+-spec is_smaller_or_equal(Number1 :: bigdec:bigdec(), Number2 :: bigdec:bigdec()) ->
                           Result :: true | false.
 is_smaller_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
   is_equal(Num1, Num2) orelse is_smaller(Num1, Num2).
@@ -224,7 +217,7 @@ is_smaller_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 %% @doc Validates if BigDec Number1 is greater than or equal to BigDec Number2.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_greater_or_equal(Number1 :: bigdec(), Number2 :: bigdec()) ->
+-spec is_greater_or_equal(Number1 :: bigdec:bigdec(), Number2 :: bigdec:bigdec()) ->
                           Result :: true | false.
 is_greater_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
   is_equal(Num1, Num2) orelse is_greater(Num1, Num2).
@@ -237,7 +230,7 @@ is_greater_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 %% equivalent to zero.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_zero(Number :: bigdec()) -> Result :: true | false.
+-spec is_zero(Number :: bigdec:bigdec()) -> Result :: true | false.
 is_zero(Num = #bigdec{}) ->
   %% First we strip the number for later evaluation
   #bigdec{value = Value, exp = Exp} = bigdec_transform:strip_zeros(Num),
@@ -251,7 +244,7 @@ is_zero(Num = #bigdec{}) ->
 %% one, sign equal to zero and exp equal to zero.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_one(Number :: bigdec()) -> Result :: true | false.
+-spec is_one(Number :: bigdec:bigdec()) -> Result :: true | false.
 is_one(Num = #bigdec{}) ->
   %% First we strip the number for later evaluation
   #bigdec{sign = Sign, value = Value, exp = Exp} = bigdec_transform:strip_zeros(Num),
@@ -265,7 +258,7 @@ is_one(Num = #bigdec{}) ->
 %% ten, sign equal to zero and exp equal to zero.
 %% @end
 %%-----------------------------------------------------------------------------
--spec is_ten(Number :: bigdec()) -> Result :: true | false.
+-spec is_ten(Number :: bigdec:bigdec()) -> Result :: true | false.
 is_ten(Num = #bigdec{}) ->
   %% First we strip the number for later evaluation
   #bigdec{sign = Sign, value = Value, exp = Exp} = bigdec_transform:strip_zeros(Num),
@@ -280,7 +273,7 @@ is_ten(Num = #bigdec{}) ->
 %% Function does not use pattern is_* to avoid conflict with BIF is_integer.
 %% @end
 %%-----------------------------------------------------------------------------
--spec contains_integer(Number :: bigdec()) -> Result :: true | false.
+-spec contains_integer(Number :: bigdec:bigdec()) -> Result :: true | false.
 contains_integer(Num = #bigdec{exp = Exp}) ->
   case Exp of
     %% We have no decimal places in bigdec
@@ -303,8 +296,8 @@ contains_integer(Num = #bigdec{exp = Exp}) ->
 %% losing precision of data, but not the other way around.
 %% @end
 %%-----------------------------------------------------------------------------
--spec match_exp(Number1 :: bigdec(), Number2 :: bigdec()) ->
-                Result  :: {integer(), bigdec(), bigdec()}.
+-spec match_exp(Number1 :: bigdec:bigdec(), Number2 :: bigdec:bigdec()) ->
+                Result  :: {integer(), bigdec:bigdec(), bigdec:bigdec()}.
 match_exp(Num1 = #bigdec{},
           Num2 = #bigdec{}) ->
   %% Retrieve the stripped numbers for calculation

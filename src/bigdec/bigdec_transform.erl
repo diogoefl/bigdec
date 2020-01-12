@@ -31,13 +31,6 @@
 %%=============================================================================
 
 -include("bigdec.hrl").
--type     bigdec() :: #bigdec{sign  :: 0 | 1,
-                              value :: non_neg_integer(),
-                              exp   :: non_neg_integer()}.
-%% bigdec() defines tuple object representing a BigDec number. The data
-%% structure of bigdec is formed by 3 elements: sign, integer value and
-%% exponent. These three elements form the definition of the number based on
-%% the following formula: (Sign * -1) * IntValue * (10 ^ Exp).
 
 %%=============================================================================
 %% Module setup
@@ -90,7 +83,7 @@
 %% correction bigdec defining sign as 0 (positive of zero).
 %% @end
 %%-----------------------------------------------------------------------------
--spec neg(Number :: bigdec()) -> Result :: bigdec().
+-spec neg(Number :: bigdec:bigdec()) -> Result :: bigdec:bigdec().
 neg(Num = #bigdec{value = 0}) -> Num;
 neg(Num = #bigdec{sign = 0})  -> Num#bigdec{sign = 1};
 neg(Num = #bigdec{sign = 1})  -> Num#bigdec{sign = 0};
@@ -105,7 +98,7 @@ neg(Num = #bigdec{sign = _})  -> Num#bigdec{sign = 0}.
 %% found in bigdec, the same bigdec is returned.
 %% @end
 %%-----------------------------------------------------------------------------
--spec strip_zeros(Number :: bigdec()) -> Result :: bigdec().
+-spec strip_zeros(Number :: bigdec:bigdec()) -> Result :: bigdec:bigdec().
 strip_zeros(Num = #bigdec{value = Value, exp = Exp}) ->
   case bigdec_analysis:has_trailing_zeros(Num) of
     {false,     0} -> Num;

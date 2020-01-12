@@ -10,67 +10,71 @@
 <hr>
 
 <h1>Module bigdec</h1>
-<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Arbitrary Precision Decimal library.
-<p>Copyright © (diogoefl) 2020. All Rights Reserved.
-  
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-  
-       http://www.apache.org/licenses/LICENSE-2.0
-  
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" basis,
-   without warranties or conditions of any kind, either express or
-   implied. See the License for the specific language governing permissions
-   and limitations under the License.
-  `</p>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Arbitrary Precision Decimal library API.
+<p>Copyright © (diogoefl) 2020. All Rights Reserved.</p>
 
 <p><b>Authors:</b> diogoefl.</p>
 
-<h2><a name="description">Description</a></h2><p>Arbitrary Precision Decimal library.</p>
+<h2><a name="description">Description</a></h2><p>Arbitrary Precision Decimal library API.</p>
   
-   Defines group of functions for arithmetic, conversion and data structures
-   when using decimals of arbitrary precision.
+   Defines group of functions for arithmetic, conversion and data structures when using decimals of arbitrary
+   precision. This module wraps functions of other internal modules to provide cleaner API interface for the user.
 <h2><a name="types">Data Types</a></h2>
 
 <h3 class="typedecl"><a name="type-bigdec">bigdec()</a></h3>
 <p><tt>bigdec() = #bigdec{sign = 0 | 1, value = non_neg_integer(), exp = non_neg_integer()}</tt></p>
-<p>  bigdec() defines tuple object representing a BigDec number. The data
-  structure of bigdec is formed by 3 elements: sign, integer value and
-  exponent. These three elements form the definition of the number based on
-  the following formula: (Sign * -1) * IntValue * (10 ^ Exp).</p>
+<p>  bigdec() defines tuple object representing a BigDec number. The data structure of bigdec is formed by 3 elements:
+  sign, integer value and exponent. These three elements form the definition of the number based on the following
+  formula: (Sign * -1) * IntValue * (10 ^ Exp).</p>
 
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add-2">add/2</a></td><td>Add two bigdec numbers by matching scale if necessary.</td></tr>
 <tr><td valign="top"><a href="#as_text-1">as_text/1</a></td><td>Convert bigdec representation as text.</td></tr>
-<tr><td valign="top"><a href="#compare-2">compare/2</a></td><td>Compares BigDec Number1 with BigDec Number2 and returns atom defining
-  if Number1 is equal, greater or smaller than Number2.</td></tr>
-<tr><td valign="top"><a href="#contains_integer-1">contains_integer/1</a></td><td>Wrapper for bigdec_comp:contains_integer/1.</td></tr>
-<tr><td valign="top"><a href="#exponent_val-1">exponent_val/1</a></td><td>Value of exponent in bigdec number.</td></tr>
-<tr><td valign="top"><a href="#is_equal-2">is_equal/2</a></td><td>Verifies if both bigdec numbers have equal numerical values.</td></tr>
-<tr><td valign="top"><a href="#is_greater-2">is_greater/2</a></td><td>Verifies if first argument is greater than second argument.</td></tr>
-<tr><td valign="top"><a href="#is_greater_or_equal-2">is_greater_or_equal/2</a></td><td>Validates if BigDec Number1 is greater than or equal to BigDec Number2.</td></tr>
-<tr><td valign="top"><a href="#is_one-1">is_one/1</a></td><td>Wrapper for bigdec_comp:is_one/1.</td></tr>
-<tr><td valign="top"><a href="#is_smaller-2">is_smaller/2</a></td><td>Verifies if first argument is smaller than second argument.</td></tr>
-<tr><td valign="top"><a href="#is_smaller_or_equal-2">is_smaller_or_equal/2</a></td><td>Validates if BigDec Number1 is smaller than or equal to BigDec Number2.</td></tr>
-<tr><td valign="top"><a href="#is_ten-1">is_ten/1</a></td><td>Wrapper for bigdec_comp:is_ten/1.</td></tr>
-<tr><td valign="top"><a href="#is_zero-1">is_zero/1</a></td><td>Wrapper for bigdec_comp:is_zero/1.</td></tr>
-<tr><td valign="top"><a href="#match_exp-2">match_exp/2</a></td><td>Wrapper for bigdec_comp:match_exp/2.</td></tr>
-<tr><td valign="top"><a href="#max-2">max/2</a></td><td>Returns which of the two BigDec Numbers is the greatest in value, and
-  if they are both equals, return first argument.</td></tr>
-<tr><td valign="top"><a href="#min-2">min/2</a></td><td>Returns which of the two BigDec Numbers is the smallest in value, and
-  if they are both equals, return first argument.</td></tr>
+<tr><td valign="top"><a href="#compare-2">compare/2</a></td><td>Equivalent to <a href="bigdec_comp.html#compare-2"><tt>bigdec_comp:compare(Number1, Number2)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#contains_integer-1">contains_integer/1</a></td><td>Equivalent to <a href="bigdec_comp.html#contains_integer-1"><tt>bigdec_comp:contains_integer(Number)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#exponent_val-1">exponent_val/1</a></td><td>Equivalent to <a href="bigdec_analysis.html#exponent_val-1"><tt>bigdec_analysis:exponent_val(Number)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#is_equal-2">is_equal/2</a></td><td>Equivalent to <a href="bigdec_comp.html#is_equal-2"><tt>bigdec_comp:is_equal(Number1, Number2)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#is_greater-2">is_greater/2</a></td><td>Equivalent to <a href="bigdec_comp.html#is_greater-2"><tt>bigdec_comp:is_greater(Number1, Number2)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#is_greater_or_equal-2">is_greater_or_equal/2</a></td><td>Equivalent to <a href="bigdec_comp.html#is_greater_or_equal-2"><tt>bigdec_comp:is_greater_or_equal(Number1, Number2)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#is_one-1">is_one/1</a></td><td>Equivalent to <a href="bigdec_comp.html#is_one-1"><tt>bigdec_comp:is_one(Number)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#is_smaller-2">is_smaller/2</a></td><td>Equivalent to <a href="bigdec_comp.html#is_smaller-2"><tt>bigdec_comp:is_smaller(Number1, Number2)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#is_smaller_or_equal-2">is_smaller_or_equal/2</a></td><td>Equivalent to <a href="bigdec_comp.html#is_smaller_or_equal-2"><tt>bigdec_comp:is_smaller_or_equal(Number1, Number2)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#is_ten-1">is_ten/1</a></td><td>Equivalent to <a href="bigdec_comp.html#is_ten-1"><tt>bigdec_comp:is_ten(Number)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#is_zero-1">is_zero/1</a></td><td>Equivalent to <a href="bigdec_comp.html#is_zero-1"><tt>bigdec_comp:is_zero(Number)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#match_exp-2">match_exp/2</a></td><td>Equivalent to <a href="bigdec_comp.html#match_exp-2"><tt>bigdec_comp:match_exp(Number1, Number2)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#max-2">max/2</a></td><td>Equivalent to <a href="bigdec_comp.html#max-2"><tt>bigdec_comp:max(Number1, Number2)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#min-2">min/2</a></td><td>Equivalent to <a href="bigdec_comp.html#min-2"><tt>bigdec_comp:min(Number1, Number2)</tt></a>.
+</td></tr>
 <tr><td valign="top"><a href="#minus-2">minus/2</a></td><td>Subtracts two bigdec numbers by matching scale if necessary.</td></tr>
-<tr><td valign="top"><a href="#neg-1">neg/1</a></td><td>Negate bigdec changing its sign from 0 to 1 or vice-versa.</td></tr>
-<tr><td valign="top"><a href="#one-0">one/0</a></td><td>Bigdec construct regarding value of one when exponent is 0.</td></tr>
-<tr><td valign="top"><a href="#precision_val-1">precision_val/1</a></td><td>Amount of digits of the unscaled valued for the bigdec, also known as  
-precision of bigdec.</td></tr>
-<tr><td valign="top"><a href="#sign_val-1">sign_val/1</a></td><td>Atom defining sign for bigdec.</td></tr>
-<tr><td valign="top"><a href="#strip_zeros-1">strip_zeros/1</a></td><td>Strip possible trailing zeros in bigdec number.</td></tr>
-<tr><td valign="top"><a href="#ten-0">ten/0</a></td><td>Bigdec construct regarding value of ten when exponent is 0.</td></tr>
-<tr><td valign="top"><a href="#unscaled_val-1">unscaled_val/1</a></td><td>Value of unscaled integer representation not applying exponent power.</td></tr>
-<tr><td valign="top"><a href="#zero-0">zero/0</a></td><td>Bigdec construct regarding value of zero when exponent is 0.</td></tr>
+<tr><td valign="top"><a href="#neg-1">neg/1</a></td><td>Equivalent to <a href="bigdec_transform.html#neg-1"><tt>bigdec_transform:neg(Number)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#one-0">one/0</a></td><td>Equivalent to <a href="bigdec_const.html#one-0"><tt>bigdec_const:one()</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#precision_val-1">precision_val/1</a></td><td>Equivalent to <a href="bigdec_analysis.html#precision_val-1"><tt>bigdec_analysis:precision_val(Number)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#sign_val-1">sign_val/1</a></td><td>Equivalent to <a href="bigdec_analysis.html#sign_val-1"><tt>bigdec_analysis:sign_val(Number)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#strip_zeros-1">strip_zeros/1</a></td><td>Equivalent to <a href="bigdec_transform.html#strip_zeros-1"><tt>bigdec_transform:strip_zeros(Number)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#ten-0">ten/0</a></td><td>Equivalent to <a href="bigdec_const.html#ten-0"><tt>bigdec_const:ten()</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#unscaled_val-1">unscaled_val/1</a></td><td>Equivalent to <a href="bigdec_analysis.html#unscaled_val-1"><tt>bigdec_analysis:unscaled_val(Number)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#zero-0">zero/0</a></td><td>Equivalent to <a href="bigdec_const.html#zero-0"><tt>bigdec_const:zero()</tt></a>.
+</td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
@@ -95,91 +99,86 @@ precision of bigdec.</td></tr>
 <h3 class="function"><a name="compare-2">compare/2</a></h3>
 <div class="spec">
 <p><tt>compare(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::equal | greater | smaller</tt><br></p>
-</div><p>Compares BigDec Number1 with BigDec Number2 and returns atom defining
-  if Number1 is equal, greater or smaller than Number2.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#compare-2"><tt>bigdec_comp:compare(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="contains_integer-1">contains_integer/1</a></h3>
 <div class="spec">
 <p><tt>contains_integer(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
-</div><p>Wrapper for bigdec_comp:contains_integer/1.</p>
-<p><b>See also:</b> <a href="bigdec_comp.html#contains_integer-1">Implementation at bigdec_comp module.</a>.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#contains_integer-1"><tt>bigdec_comp:contains_integer(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="exponent_val-1">exponent_val/1</a></h3>
 <div class="spec">
 <p><tt>exponent_val(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::integer()</tt><br></p>
-</div><p><p>Value of exponent in bigdec number.</p>
- 
-  The exponent is the component N on the number representation of V * 10 ^ -N.
-  Exponent value in bigdec is neg against the representation, meaning that for
-  example 0.2 is represented as (2 * 10 ^ -1) and the exponent value is +1.</p>
+</div><p>Equivalent to <a href="bigdec_analysis.html#exponent_val-1"><tt>bigdec_analysis:exponent_val(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="is_equal-2">is_equal/2</a></h3>
 <div class="spec">
 <p><tt>is_equal(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
-</div><p><p>Verifies if both bigdec numbers have equal numerical values.</p>
- 
-  Checks if bigdec can be precisely represent the same value as the other, and
-  if they don't match em exponent value, recheck by matching exponents.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#is_equal-2"><tt>bigdec_comp:is_equal(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="is_greater-2">is_greater/2</a></h3>
 <div class="spec">
 <p><tt>is_greater(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
-</div><p><p>Verifies if first argument is greater than second argument.</p>
- 
-  Checks if bigdec Number1 represents a numeric value greater than Number2.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#is_greater-2"><tt>bigdec_comp:is_greater(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="is_greater_or_equal-2">is_greater_or_equal/2</a></h3>
 <div class="spec">
 <p><tt>is_greater_or_equal(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
-</div><p>Validates if BigDec Number1 is greater than or equal to BigDec Number2.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#is_greater_or_equal-2"><tt>bigdec_comp:is_greater_or_equal(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="is_one-1">is_one/1</a></h3>
 <div class="spec">
 <p><tt>is_one(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
-</div><p>Wrapper for bigdec_comp:is_one/1.</p>
-<p><b>See also:</b> <a href="bigdec_comp.html#is_one-1">Implementation at bigdec_comp module.</a>.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#is_one-1"><tt>bigdec_comp:is_one(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="is_smaller-2">is_smaller/2</a></h3>
 <div class="spec">
 <p><tt>is_smaller(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
-</div><p><p>Verifies if first argument is smaller than second argument.</p>
- 
-  Checks if bigdec Number1 represents a numeric value smaller than Number2.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#is_smaller-2"><tt>bigdec_comp:is_smaller(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="is_smaller_or_equal-2">is_smaller_or_equal/2</a></h3>
 <div class="spec">
 <p><tt>is_smaller_or_equal(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
-</div><p>Validates if BigDec Number1 is smaller than or equal to BigDec Number2.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#is_smaller_or_equal-2"><tt>bigdec_comp:is_smaller_or_equal(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="is_ten-1">is_ten/1</a></h3>
 <div class="spec">
 <p><tt>is_ten(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
-</div><p>Wrapper for bigdec_comp:is_ten/1.</p>
-<p><b>See also:</b> <a href="bigdec_comp.html#is_ten-1">Implementation at bigdec_comp module.</a>.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#is_ten-1"><tt>bigdec_comp:is_ten(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="is_zero-1">is_zero/1</a></h3>
 <div class="spec">
 <p><tt>is_zero(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
-</div><p>Wrapper for bigdec_comp:is_zero/1.</p>
-<p><b>See also:</b> <a href="bigdec_comp.html#is_zero-1">Implementation at bigdec_comp module.</a>.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#is_zero-1"><tt>bigdec_comp:is_zero(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="match_exp-2">match_exp/2</a></h3>
 <div class="spec">
 <p><tt>match_exp(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::{integer(), <a href="#type-bigdec">bigdec()</a>, <a href="#type-bigdec">bigdec()</a>}</tt><br></p>
-</div><p>Wrapper for bigdec_comp:match_exp/2.</p>
-<p><b>See also:</b> <a href="bigdec_comp.html#match_exp-2">Implementation at bigdec_comp module.</a>.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#match_exp-2"><tt>bigdec_comp:match_exp(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="max-2">max/2</a></h3>
 <div class="spec">
 <p><tt>max(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; MaxValue::<a href="#type-bigdec">bigdec()</a></tt><br></p>
-</div><p>Returns which of the two BigDec Numbers is the greatest in value, and
-  if they are both equals, return first argument.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#max-2"><tt>bigdec_comp:max(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="min-2">min/2</a></h3>
 <div class="spec">
 <p><tt>min(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; MinValue::<a href="#type-bigdec">bigdec()</a></tt><br></p>
-</div><p>Returns which of the two BigDec Numbers is the smallest in value, and
-  if they are both equals, return first argument.</p>
+</div><p>Equivalent to <a href="bigdec_comp.html#min-2"><tt>bigdec_comp:min(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="minus-2">minus/2</a></h3>
 <div class="spec">
@@ -192,62 +191,50 @@ precision of bigdec.</td></tr>
 <h3 class="function"><a name="neg-1">neg/1</a></h3>
 <div class="spec">
 <p><tt>neg(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
-</div><p><p>Negate bigdec changing its sign from 0 to 1 or vice-versa.</p>
- 
-  If sign defined in bigdec is invalid (different from 0 or 1), we return a
-  correction bigdec defining sign as 0 (positive of zero).</p>
+</div><p>Equivalent to <a href="bigdec_transform.html#neg-1"><tt>bigdec_transform:neg(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="one-0">one/0</a></h3>
 <div class="spec">
 <p><tt>one() -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
-</div><p>Bigdec construct regarding value of one when exponent is 0.</p>
+</div><p>Equivalent to <a href="bigdec_const.html#one-0"><tt>bigdec_const:one()</tt></a>.</p>
+
 
 <h3 class="function"><a name="precision_val-1">precision_val/1</a></h3>
 <div class="spec">
 <p><tt>precision_val(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::non_neg_integer()</tt><br></p>
-</div><p><p>Amount of digits of the unscaled valued for the bigdec, also known as  
-precision of bigdec.</p>
- 
-  Calculates the amount of digits found in the representation of the unscaled
-  value for the bigdec. This amount is not stripped of trailing zeros.</p>
+</div><p>Equivalent to <a href="bigdec_analysis.html#precision_val-1"><tt>bigdec_analysis:precision_val(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="sign_val-1">sign_val/1</a></h3>
 <div class="spec">
 <p><tt>sign_val(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::positive | negative | invalid</tt><br></p>
-</div><p><p>Atom defining sign for bigdec.</p>
- 
-  The sign used in bigdec structures use 0 for postive or zero numbers, and 1
-  for negative numbers. This functions returns atom positive if sign is 0 and
-  atom negative if sign is 1. If bigdec gets incorrect data and sign is not 0
-  or 1, than atom invalid is returned.</p>
+</div><p>Equivalent to <a href="bigdec_analysis.html#sign_val-1"><tt>bigdec_analysis:sign_val(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="strip_zeros-1">strip_zeros/1</a></h3>
 <div class="spec">
 <p><tt>strip_zeros(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
-</div><p><p>Strip possible trailing zeros in bigdec number.</p>
- 
-  If there is any trailing zero, returns a new bigdec with stripped zeros from
-  the right side ov value and adjusted exp value. If no trailing zeros are
-  found in bigdec, the same bigdec is returned.</p>
+</div><p>Equivalent to <a href="bigdec_transform.html#strip_zeros-1"><tt>bigdec_transform:strip_zeros(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="ten-0">ten/0</a></h3>
 <div class="spec">
 <p><tt>ten() -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
-</div><p>Bigdec construct regarding value of ten when exponent is 0.</p>
+</div><p>Equivalent to <a href="bigdec_const.html#ten-0"><tt>bigdec_const:ten()</tt></a>.</p>
+
 
 <h3 class="function"><a name="unscaled_val-1">unscaled_val/1</a></h3>
 <div class="spec">
 <p><tt>unscaled_val(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::non_neg_integer()</tt><br></p>
-</div><p><p>Value of unscaled integer representation not applying exponent power.</p>
- 
-  The unscaled value represents the number that multiplied by power of exp by
-  10 represents the real value of bigdec. The unscaled value is not stripped
-  of trailing zeros.</p>
+</div><p>Equivalent to <a href="bigdec_analysis.html#unscaled_val-1"><tt>bigdec_analysis:unscaled_val(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="zero-0">zero/0</a></h3>
 <div class="spec">
 <p><tt>zero() -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
-</div><p>Bigdec construct regarding value of zero when exponent is 0.</p>
+</div><p>Equivalent to <a href="bigdec_const.html#zero-0"><tt>bigdec_const:zero()</tt></a>.</p>
+
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>

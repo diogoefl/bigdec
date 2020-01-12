@@ -1,50 +1,43 @@
-%%%----------------------------------------------------------------------------
+%%%= LICENSE INFORMATION START ========================================================================================
 %%% BigDec Library
 %%%
-%%% @author diogoefl
-%%% @copyright (diogoefl) 2020. All Rights Reserved.
-%%%
-%%% Licensed under the Apache License, Version 2.0 (the "License");
-%%% you may not use this file except in compliance with the License.
-%%% You may obtain a copy of the License at
+%%% Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+%%% the License. You may obtain a copy of the License at
 %%%
 %%%     http://www.apache.org/licenses/LICENSE-2.0
 %%%
-%%% Unless required by applicable law or agreed to in writing, software
-%%% distributed under the License is distributed on an "AS IS" basis,
-%%% without warranties or conditions of any kind, either express or
-%%% implied. See the License for the specific language governing permissions
-%%% and limitations under the License.
-%%%`
-%%% @doc Arbitrary Precision Decimal library.
-%%%
-%%% Defines group of functions for arithmetic, conversion and data structures
-%%% when using decimals of arbitrary precision.
-%%% @end
-%%%
-%%%----------------------------------------------------------------------------
+%%% Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+%%% an "AS IS" basis, without warranties or conditions of any kind, either express or implied. See the License for the
+%%% specific language governing permissions and limitations under the License.
+%%%= LICENSE INFORMATION END===========================================================================================
 
+%%%--------------------------------------------------------------------------------------------------------------------
+%%% @doc Arbitrary Precision Decimal library API.
+%%%
+%%% Defines group of functions for arithmetic, conversion and data structures when using decimals of arbitrary
+%%% precision. This module wraps functions of other internal modules to provide cleaner API interface for the user.
+%%% @author diogoefl
+%%% @copyright (diogoefl) 2020. All Rights Reserved.
+%%% @end
+%%%--------------------------------------------------------------------------------------------------------------------
 -module(bigdec).
 %% @headerfile ["bigdec.hrl"]
 
-%%=============================================================================
-%% Data Structures
-%%=============================================================================
-
+%%%====================================================================================================================
+%%% Data Structures
+%%%====================================================================================================================
 -include("bigdec.hrl").
+-export_type([bigdec/0]).
 -type     bigdec() :: #bigdec{sign  :: 0 | 1,
                               value :: non_neg_integer(),
                               exp   :: non_neg_integer()}.
-%% bigdec() defines tuple object representing a BigDec number. The data
-%% structure of bigdec is formed by 3 elements: sign, integer value and
-%% exponent. These three elements form the definition of the number based on
-%% the following formula: (Sign * -1) * IntValue * (10 ^ Exp).
+%% bigdec() defines tuple object representing a BigDec number. The data structure of bigdec is formed by 3 elements:
+%% sign, integer value and exponent. These three elements form the definition of the number based on the following
+%% formula: (Sign * -1) * IntValue * (10 ^ Exp).
 
-%%=============================================================================
-%% Module setup
-%%=============================================================================
-
-%% Library Public API
+%%%====================================================================================================================
+%%% Module setup
+%%%====================================================================================================================
 -export([]).
 
 %% Conversion to bigdec
@@ -60,9 +53,8 @@
 -export([neg/1, strip_zeros/1]).
 
 %% bigdec_comp module
--export([min/2, max/2, compare/2, is_smaller_or_equal/2, is_greater_or_equal/2,
-         is_equal/2, is_smaller/2, is_greater/2, is_zero/1, is_one/1, is_ten/1,
-         contains_integer/1, match_exp/2]).
+-export([min/2, max/2, compare/2, is_smaller_or_equal/2, is_greater_or_equal/2, is_equal/2, is_smaller/2, is_greater/2,
+         is_zero/1, is_one/1, is_ten/1, contains_integer/1, match_exp/2]).
 
 %% bigdec_analysis module
 -export([exponent_val/1, unscaled_val/1, sign_val/1, precision_val/1]).
@@ -70,17 +62,16 @@
 %% bigdec_const module
 -export([one/0, zero/0, ten/0]).
 
-%%=============================================================================
-%% EUnit setup
-%%=============================================================================
-
+%%%====================================================================================================================
+%%% EUnit setup
+%%%====================================================================================================================
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
-%%=============================================================================
-%% Library public API
-%%=============================================================================
+%%%====================================================================================================================
+%%% Library implementation
+%%%====================================================================================================================
 
 
 %%=============================================================================
@@ -195,241 +186,107 @@ add(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 minus(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
   add(Num1, neg(Num2)).
 
-%%=============================================================================
-%% bigdec_transform module
-%%=============================================================================
+%%%====================================================================================================================
+%%% Library public API for module bigdec_transform
+%%%====================================================================================================================
 
-%%-----------------------------------------------------------------------------
-%% @doc Negate bigdec changing its sign from 0 to 1 or vice-versa.
-%%
-%% If sign defined in bigdec is invalid (different from 0 or 1), we return a
-%% correction bigdec defining sign as 0 (positive of zero).
-%% @end
-%%-----------------------------------------------------------------------------
+%% @equiv bigdec_transform:neg(Number)
 -spec neg(Number :: bigdec()) -> Result :: bigdec().
 neg(Num = #bigdec{}) -> bigdec_transform:neg(Num).
 
-
-%%-----------------------------------------------------------------------------
-%% @doc Strip possible trailing zeros in bigdec number.
-%%
-%% If there is any trailing zero, returns a new bigdec with stripped zeros from
-%% the right side ov value and adjusted exp value. If no trailing zeros are
-%% found in bigdec, the same bigdec is returned.
-%% @end
-%%-----------------------------------------------------------------------------
+%% @equiv bigdec_transform:strip_zeros(Number)
 -spec strip_zeros(Number :: bigdec()) -> Result :: bigdec().
 strip_zeros(Num = #bigdec{}) -> bigdec_transform:strip_zeros(Num).
 
-%%=============================================================================
-%% Library public functions - Comparison
-%%
-%% Planned functions to be implemented
-%% => Comparisons
-%% max(#bigdec{}, #bigdec{})        -> #bigdec{} (DONE)
-%% min(#bigdec{}, #bigdec{})        -> #bigdec{} (DONE)
-%% compare(#bigdec{}, #bigdec{})    -> equal | greater | smaller (DONE)
-%% is_equal(#bigdec{}, #bigdec{})   -> true | false (DONE)
-%% is_smaller(#bigdec{}, #bigdec{}) -> true | false (DONE)
-%% is_greater(#bigdec{}, #bigdec{}) -> true | false (DONE)
-%% is_smaller_or_equal(#bigdec{}, #bigdec{}) -> true | false (DONE)
-%% is_greater_or_equal(#bigdec{}, #bigdec{}) -> true | false (DONE)
-%% is_zero(#bigdec{})               -> true | false (DONE)
-%% is_one(#bigdec{})                -> true | false (DONE)
-%% is_ten(#bigdec{})                -> true | false (DONE)
-%% contains_integer(#bigdec{})      -> true | false (DONE)
-%% match_exp(#bigdec{}, #bigdec{})  -> integer() (DONE)
-%%
-%%=============================================================================
+%%%====================================================================================================================
+%%% Library public API for module bigdec_comp
+%%%====================================================================================================================
 
-%%-----------------------------------------------------------------------------
-%% @doc Returns which of the two BigDec Numbers is the greatest in value, and
-%% if they are both equals, return first argument.
-%% @end
-%%-----------------------------------------------------------------------------
+%% @equiv bigdec_comp:max(Number1, Number2)
 -spec max(Number1 :: bigdec(), Number2 :: bigdec()) -> MaxValue :: bigdec().
 max(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:max(Num1, Num2).
 
-%%-----------------------------------------------------------------------------
-%% @doc Returns which of the two BigDec Numbers is the smallest in value, and
-%% if they are both equals, return first argument.
-%% @end
-%%-----------------------------------------------------------------------------
+%% @equiv bigdec_comp:min(Number1, Number2)
 -spec min(Number1 :: bigdec(), Number2 :: bigdec()) -> MinValue :: bigdec().
 min(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:min(Num1, Num2).
 
-%%-----------------------------------------------------------------------------
-%% @doc Compares BigDec Number1 with BigDec Number2 and returns atom defining
-%% if Number1 is equal, greater or smaller than Number2.
-%% @end
-%%-----------------------------------------------------------------------------
--spec compare(Number1 :: bigdec(), Number2 :: bigdec()) ->
-              Result :: equal | greater | smaller.
+%% @equiv bigdec_comp:compare(Number1, Number2)
+-spec compare(Number1 :: bigdec(), Number2 :: bigdec()) -> Result :: equal | greater | smaller.
 compare(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:compare(Num1, Num2).
 
-%%-----------------------------------------------------------------------------
-%% @doc Verifies if both bigdec numbers have equal numerical values.
-%%
-%% Checks if bigdec can be precisely represent the same value as the other, and
-%% if they don't match em exponent value, recheck by matching exponents.
-%% @end
-%%-----------------------------------------------------------------------------
--spec is_equal(Number1 :: bigdec(),
-               Number2 :: bigdec()) ->
-               Result  :: true | false.
+%% @equiv bigdec_comp:is_equal(Number1, Number2)
+-spec is_equal(Number1 :: bigdec(), Number2 :: bigdec()) -> Result  :: true | false.
 is_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:is_equal(Num1, Num2).
 
-%%-----------------------------------------------------------------------------
-%% @doc Verifies if first argument is smaller than second argument.
-%%
-%% Checks if bigdec Number1 represents a numeric value smaller than Number2.
-%% @end
-%%-----------------------------------------------------------------------------
--spec is_smaller(Number1 :: bigdec(),
-                 Number2 :: bigdec()) ->
-                 Result  :: true | false.
+%% @equiv bigdec_comp:is_smaller(Number1, Number2)
+-spec is_smaller(Number1 :: bigdec(), Number2 :: bigdec()) -> Result  :: true | false.
 is_smaller(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:is_smaller(Num1, Num2).
 
-%%-----------------------------------------------------------------------------
-%% @doc Verifies if first argument is greater than second argument.
-%%
-%% Checks if bigdec Number1 represents a numeric value greater than Number2.
-%% @end
-%%-----------------------------------------------------------------------------
--spec is_greater(Number1 :: bigdec(),
-                 Number2 :: bigdec()) ->
-                 Result  :: true | false.
+%% @equiv bigdec_comp:is_greater(Number1, Number2)
+-spec is_greater(Number1 :: bigdec(), Number2 :: bigdec()) -> Result  :: true | false.
 is_greater(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:is_greater(Num1, Num2).
 
-%%-----------------------------------------------------------------------------
-%% @doc Validates if BigDec Number1 is smaller than or equal to BigDec Number2.
-%% @end
-%%-----------------------------------------------------------------------------
--spec is_smaller_or_equal(Number1 :: bigdec(), Number2 :: bigdec()) ->
-                          Result :: true | false.
-is_smaller_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
-  bigdec_comp:is_smaller_or_equal(Num1, Num2).
+%% @equiv bigdec_comp:is_smaller_or_equal(Number1, Number2)
+-spec is_smaller_or_equal(Number1 :: bigdec(), Number2 :: bigdec()) -> Result :: true | false.
+is_smaller_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:is_smaller_or_equal(Num1, Num2).
 
-%%-----------------------------------------------------------------------------
-%% @doc Validates if BigDec Number1 is greater than or equal to BigDec Number2.
-%% @end
-%%-----------------------------------------------------------------------------
--spec is_greater_or_equal(Number1 :: bigdec(), Number2 :: bigdec()) ->
-                          Result :: true | false.
-is_greater_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
-  bigdec_comp:is_greater_or_equal(Num1, Num2).
+%% @equiv bigdec_comp:is_greater_or_equal(Number1, Number2)
+-spec is_greater_or_equal(Number1 :: bigdec(), Number2 :: bigdec()) -> Result :: true | false.
+is_greater_or_equal(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:is_greater_or_equal(Num1, Num2).
 
-%%---------------------------------------------------------------------------------------------------------------------
-%% @doc Wrapper for bigdec_comp:is_zero/1.
-%% @see bigdec_comp:is_zero/1. Implementation at bigdec_comp module.
-%% @end
-%%---------------------------------------------------------------------------------------------------------------------
+%% @equiv bigdec_comp:is_zero(Number)
 -spec is_zero(Number :: bigdec()) -> Result :: true | false.
 is_zero(Num = #bigdec{}) -> bigdec_comp:is_zero(Num).
 
-%%---------------------------------------------------------------------------------------------------------------------
-%% @doc Wrapper for bigdec_comp:is_one/1.
-%% @see bigdec_comp:is_one/1. Implementation at bigdec_comp module.
-%% @end
-%%---------------------------------------------------------------------------------------------------------------------
+%% @equiv bigdec_comp:is_one(Number)
 -spec is_one(Number :: bigdec()) -> Result :: true | false.
 is_one(Num = #bigdec{}) -> bigdec_comp:is_one(Num).
 
-%%---------------------------------------------------------------------------------------------------------------------
-%% @doc Wrapper for bigdec_comp:is_ten/1.
-%% @see bigdec_comp:is_ten/1. Implementation at bigdec_comp module.
-%% @end
-%%---------------------------------------------------------------------------------------------------------------------
+%% @equiv bigdec_comp:is_ten(Number)
 -spec is_ten(Number :: bigdec()) -> Result :: true | false.
 is_ten(Num = #bigdec{}) -> bigdec_comp:is_ten(Num).
 
-%%---------------------------------------------------------------------------------------------------------------------
-%% @doc Wrapper for bigdec_comp:contains_integer/1.
-%% @see bigdec_comp:contains_integer/1. Implementation at bigdec_comp module.
-%% @end
-%%---------------------------------------------------------------------------------------------------------------------
+%% @equiv bigdec_comp:contains_integer(Number)
 -spec contains_integer(Number :: bigdec()) -> Result :: true | false.
 contains_integer(Num = #bigdec{}) -> bigdec_comp:contains_integer(Num).
 
-%%---------------------------------------------------------------------------------------------------------------------
-%% @doc Wrapper for bigdec_comp:match_exp/2.
-%% @see bigdec_comp:match_exp/2. Implementation at bigdec_comp module.
-%% @end
-%%---------------------------------------------------------------------------------------------------------------------
+%% @equiv bigdec_comp:match_exp(Number1, Number2)
 -spec match_exp(Number1 :: bigdec(), Number2 :: bigdec()) -> Result  :: {integer(), bigdec(), bigdec()}.
 match_exp(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_comp:match_exp(Num1, Num2).
 
-%%=============================================================================
-%% Library public functions - Analysis
-%%=============================================================================
+%%%====================================================================================================================
+%%% Library public API for module bigdec_analysis
+%%%====================================================================================================================
 
-%%-----------------------------------------------------------------------------
-%% @doc Value of exponent in bigdec number.
-%%
-%% The exponent is the component N on the number representation of V * 10 ^ -N.
-%% Exponent value in bigdec is neg against the representation, meaning that for
-%% example 0.2 is represented as (2 * 10 ^ -1) and the exponent value is +1.
-%% @end
-%%----------------------------------------------------------------------------
+%% @equiv bigdec_analysis:exponent_val(Number)
 -spec exponent_val(Number :: bigdec()) -> Result :: integer().
 exponent_val(Num = #bigdec{}) -> bigdec_analysis:exponent_val(Num).
 
-%%-----------------------------------------------------------------------------
-%% @doc Value of unscaled integer representation not applying exponent power.
-%%
-%% The unscaled value represents the number that multiplied by power of exp by
-%% 10 represents the real value of bigdec. The unscaled value is not stripped
-%% of trailing zeros.
-%% @end
-%%----------------------------------------------------------------------------
+%% @equiv bigdec_analysis:unscaled_val(Number)
 -spec unscaled_val(Number :: bigdec()) -> Result :: non_neg_integer().
 unscaled_val(Num = #bigdec{}) -> bigdec_analysis:unscaled_val(Num).
 
-%%-----------------------------------------------------------------------------
-%% @doc Atom defining sign for bigdec.
-%%
-%% The sign used in bigdec structures use 0 for postive or zero numbers, and 1
-%% for negative numbers. This functions returns atom positive if sign is 0 and
-%% atom negative if sign is 1. If bigdec gets incorrect data and sign is not 0
-%% or 1, than atom invalid is returned.
-%% @end
-%%----------------------------------------------------------------------------
+%% @equiv bigdec_analysis:sign_val(Number)
 -spec sign_val(Number :: bigdec()) -> Result :: positive | negative | invalid.
 sign_val(Num = #bigdec{}) -> bigdec_analysis:sign_val(Num).
 
-%%-----------------------------------------------------------------------------
-%% @doc Amount of digits of the unscaled valued for the bigdec, also known as
-%% precision of bigdec.
-%%
-%% Calculates the amount of digits found in the representation of the unscaled
-%% value for the bigdec. This amount is not stripped of trailing zeros.
-%% @end
-%%----------------------------------------------------------------------------
+%% @equiv bigdec_analysis:precision_val(Number)
 -spec precision_val(Number :: bigdec()) -> Result :: non_neg_integer().
 precision_val(Num = #bigdec{}) -> bigdec_analysis:precision_val(Num).
 
-%%=============================================================================
-%% Public API for bigdec_const module
-%%=============================================================================
+%%%====================================================================================================================
+%%% Library public API for module bigdec_const
+%%%====================================================================================================================
 
-%%-----------------------------------------------------------------------------
-%% @doc Bigdec construct regarding value of one when exponent is 0.
-%% @end
-%%----------------------------------------------------------------------------
+%% @equiv bigdec_const:one()
 -spec one() -> Result :: bigdec().
 one() -> bigdec_const:one().
 
-%%-----------------------------------------------------------------------------
-%% @doc Bigdec construct regarding value of zero when exponent is 0.
-%% @end
-%%----------------------------------------------------------------------------
+%% @equiv bigdec_const:zero()
 -spec zero() -> Result :: bigdec().
 zero() -> bigdec_const:zero().
 
-%%-----------------------------------------------------------------------------
-%% @doc Bigdec construct regarding value of ten when exponent is 0.
-%% @end
-%%----------------------------------------------------------------------------
+%% @equiv bigdec_const:ten()
 -spec ten() -> Result :: bigdec().
 ten() -> bigdec_const:ten().
 

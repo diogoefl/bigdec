@@ -31,13 +31,6 @@
 %%=============================================================================
 
 -include("bigdec.hrl").
--type     bigdec() :: #bigdec{sign  :: 0 | 1,
-                              value :: non_neg_integer(),
-                              exp   :: non_neg_integer()}.
-%% bigdec() defines tuple object representing a BigDec number. The data
-%% structure of bigdec is formed by 3 elements: sign, integer value and
-%% exponent. These three elements form the definition of the number based on
-%% the following formula: (Sign * -1) * IntValue * (10 ^ Exp).
 
 %%=============================================================================
 %% Module setup
@@ -69,7 +62,7 @@
 %% example 0.2 is represented as (2 * 10 ^ -1) and the exponent value is +1.
 %% @end
 %%----------------------------------------------------------------------------
--spec exponent_val(Number :: bigdec()) -> Result :: integer().
+-spec exponent_val(Number :: bigdec:bigdec()) -> Result :: integer().
 exponent_val(#bigdec{exp = Value}) -> Value.
 
 %%-----------------------------------------------------------------------------
@@ -80,7 +73,7 @@ exponent_val(#bigdec{exp = Value}) -> Value.
 %% of trailing zeros.
 %% @end
 %%----------------------------------------------------------------------------
--spec unscaled_val(Number :: bigdec()) -> Result :: non_neg_integer().
+-spec unscaled_val(Number :: bigdec:bigdec()) -> Result :: non_neg_integer().
 unscaled_val(#bigdec{value = Value}) -> Value.
 
 %%-----------------------------------------------------------------------------
@@ -92,7 +85,7 @@ unscaled_val(#bigdec{value = Value}) -> Value.
 %% or 1, than atom invalid is returned.
 %% @end
 %%----------------------------------------------------------------------------
--spec sign_val(Number :: bigdec()) -> Result :: positive | negative | invalid.
+-spec sign_val(Number :: bigdec:bigdec()) -> Result :: positive | negative | invalid.
 sign_val(#bigdec{sign = 0}) -> positive;
 sign_val(#bigdec{sign = 1}) -> negative;
 sign_val(#bigdec{sign = _}) -> invalid.
@@ -105,7 +98,7 @@ sign_val(#bigdec{sign = _}) -> invalid.
 %% value for the bigdec. This amount is not stripped of trailing zeros.
 %% @end
 %%----------------------------------------------------------------------------
--spec precision_val(Number :: bigdec()) -> Result :: non_neg_integer().
+-spec precision_val(Number :: bigdec:bigdec()) -> Result :: non_neg_integer().
 precision_val(#bigdec{value = Value}) ->
   StringVal = integer_to_list(Value),
   string:length(StringVal).
@@ -131,8 +124,9 @@ precision_val(#bigdec{value = Value}) ->
 %% need to return the exp as result for stripping.
 %% @end
 %%-----------------------------------------------------------------------------
--spec has_trailing_zeros(Number :: bigdec()) -> Result :: {true, Amount :: integer()}
-                                                        | {false,                  0}.
+-spec has_trailing_zeros(Number :: bigdec:bigdec()) ->
+                         Result :: {true, Amount :: integer()}
+                                 | {false,                  0}.
 has_trailing_zeros(#bigdec{value = Value, exp = Exp}) ->
   Amount = howmany_trailing_zeros(Value, 0),
   case Amount of

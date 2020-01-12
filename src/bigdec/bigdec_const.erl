@@ -31,13 +31,6 @@
 %%=============================================================================
 
 -include("bigdec.hrl").
--type     bigdec() :: #bigdec{sign  :: 0 | 1,
-                              value :: non_neg_integer(),
-                              exp   :: non_neg_integer()}.
-%% bigdec() defines tuple object representing a BigDec number. The data
-%% structure of bigdec is formed by 3 elements: sign, integer value and
-%% exponent. These three elements form the definition of the number based on
-%% the following formula: (Sign * -1) * IntValue * (10 ^ Exp).
 
 %%=============================================================================
 %% Module setup
@@ -62,21 +55,21 @@
 %% @doc Bigdec construct regarding value of one when exponent is 0.
 %% @end
 %%----------------------------------------------------------------------------
--spec one() -> Result :: bigdec().
+-spec one() -> Result :: bigdec:bigdec().
 one() -> #bigdec{sign = 0, value = 1, exp = 0}.
 
 %%-----------------------------------------------------------------------------
 %% @doc Bigdec construct regarding value of zero when exponent is 0.
 %% @end
 %%----------------------------------------------------------------------------
--spec zero() -> Result :: bigdec().
+-spec zero() -> Result :: bigdec:bigdec().
 zero() -> #bigdec{sign = 0, value = 0, exp = 0}.
 
 %%-----------------------------------------------------------------------------
 %% @doc Bigdec construct regarding value of ten when exponent is 0.
 %% @end
 %%----------------------------------------------------------------------------
--spec ten() -> Result :: bigdec().
+-spec ten() -> Result :: bigdec:bigdec().
 ten() -> #bigdec{sign = 0, value = 10, exp = 0}.
 
 %%=============================================================================
