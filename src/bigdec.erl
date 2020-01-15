@@ -47,7 +47,7 @@
 -export([as_text/1]).
 
 %% Arithmetic
--export([add/2, minus/2]).
+-export([add/2, minus/2, mult/2]).
 
 %% bigdec_transform module
 -export([neg/1, strip_zeros/1]).
@@ -185,6 +185,28 @@ add(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
 -spec minus(Number1 :: bigdec(), Number2 :: bigdec()) -> Result :: bigdec().
 minus(Num1 = #bigdec{}, Num2 = #bigdec{}) ->
   add(Num1, neg(Num2)).
+
+%%-----------------------------------------------------------------------------
+%% @doc Multiply two bigdec numbers and strip zeros if necessary.
+%%
+%% Multiplication of bigdec numbers is made by multiplying its integer values
+%% and adding exponent values. If resulting bigdec contains trailing zeros, than
+%% we need to submit it for stripping zeros.
+%% @end
+%%-----------------------------------------------------------------------------
+-spec mult(Number1 :: bigdec(), Number2 :: bigdec()) -> Result :: bigdec().
+mult(#bigdec{sign = S1, value = Val1, exp = Exp1},
+     #bigdec{sign = S2, value = Val2, exp = Exp2}) ->
+  ResultInt  = Val1 * Val2,
+  ResultExp  = Exp1 + Exp2,
+  bigdec_transform:strip_zeros(#bigdec{sign  = case {S1, S2} of
+                                                 {0, 0} -> 0; %% Both are positive
+                                                 {0, 1} -> 1; %% Second is negative
+                                                 {1, 0} -> 1; %% First is negative
+                                                 {1, 1} -> 0  %% Both are negative
+                                               end,
+                                       value = ResultInt,
+                                       exp   = ResultExp}).
 
 %%%====================================================================================================================
 %%% Library public API for module bigdec_transform
@@ -412,6 +434,24 @@ minus_test() ->
   ?assertEqual(      #bigdec{sign = 1, value =  545, exp = 2},
                minus(#bigdec{sign = 1, value = 3745, exp = 2},
                      #bigdec{sign = 1, value =   32, exp = 0})).
+
+mult_test() ->
+  %% 1.0 * 0.500 = 0.5
+  ?assertEqual(     #bigdec{sign = 0, value =   5, exp = 1},
+               mult(#bigdec{sign = 0, value =  10, exp = 1},
+                    #bigdec{sign = 0, value = 500, exp = 3})),
+  %% 10.567 * -0.345 = -3,645615‬
+  ?assertEqual(     #bigdec{sign = 1, value = 3645615, exp = 6},
+               mult(#bigdec{sign = 0, value =   10567, exp = 3},
+                    #bigdec{sign = 1, value =     345, exp = 3})),
+  %% -5.6 * 0.0000000007 = -0.00000000392
+  ?assertEqual(     #bigdec{sign = 1, value = 392, exp = 11},
+               mult(#bigdec{sign = 1, value =  56, exp =  1},
+                    #bigdec{sign = 0, value =   7, exp = 10})),
+  %% -0.3 * -100.2 = 30.06
+  ?assertEqual(     #bigdec{sign = 0, value = 3006, exp = 2},
+               mult(#bigdec{sign = 1, value =    3, exp = 1},
+                    #bigdec{sign = 1, value = 1002, exp = 1})).
 
 float_to_bitstring_test() ->
   ?assertEqual(<<"2.20000000000000">>, float_to_bitstring(2.2)),

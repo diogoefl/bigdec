@@ -59,6 +59,7 @@
 <tr><td valign="top"><a href="#min-2">min/2</a></td><td>Equivalent to <a href="bigdec_comp.html#min-2"><tt>bigdec_comp:min(Number1, Number2)</tt></a>.
 </td></tr>
 <tr><td valign="top"><a href="#minus-2">minus/2</a></td><td>Subtracts two bigdec numbers by matching scale if necessary.</td></tr>
+<tr><td valign="top"><a href="#mult-2">mult/2</a></td><td>Multiply two bigdec numbers and strip zeros if necessary.</td></tr>
 <tr><td valign="top"><a href="#neg-1">neg/1</a></td><td>Equivalent to <a href="bigdec_transform.html#neg-1"><tt>bigdec_transform:neg(Number)</tt></a>.
 </td></tr>
 <tr><td valign="top"><a href="#one-0">one/0</a></td><td>Equivalent to <a href="bigdec_const.html#one-0"><tt>bigdec_const:one()</tt></a>.
@@ -187,6 +188,15 @@
  
   The subtraction is a wrapper for inverting sign of Num2 and proceeding with
   addition. This way we keep logic preserved.</p>
+
+<h3 class="function"><a name="mult-2">mult/2</a></h3>
+<div class="spec">
+<p><tt>mult(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
+</div><p><p>Multiply two bigdec numbers and strip zeros if necessary.</p>
+ 
+  Multiplication of bigdec numbers is made by multiplying its integer values
+  and adding exponent values. If resulting bigdec contains trailing zeros, than
+  we need to submit it for stripping zeros.</p>
 
 <h3 class="function"><a name="neg-1">neg/1</a></h3>
 <div class="spec">
