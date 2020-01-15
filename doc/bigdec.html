@@ -28,7 +28,8 @@
   formula: (Sign * -1) * IntValue * (10 ^ Exp).</p>
 
 <h2><a name="index">Function Index</a></h2>
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add-2">add/2</a></td><td>Add two bigdec numbers by matching scale if necessary.</td></tr>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add-2">add/2</a></td><td>Equivalent to <a href="bigdec_arith.html#add-2"><tt>bigdec_arith:add(Number1, Number2)</tt></a>.
+</td></tr>
 <tr><td valign="top"><a href="#as_text-1">as_text/1</a></td><td>Convert bigdec representation as text.</td></tr>
 <tr><td valign="top"><a href="#compare-2">compare/2</a></td><td>Equivalent to <a href="bigdec_comp.html#compare-2"><tt>bigdec_comp:compare(Number1, Number2)</tt></a>.
 </td></tr>
@@ -58,8 +59,10 @@
 </td></tr>
 <tr><td valign="top"><a href="#min-2">min/2</a></td><td>Equivalent to <a href="bigdec_comp.html#min-2"><tt>bigdec_comp:min(Number1, Number2)</tt></a>.
 </td></tr>
-<tr><td valign="top"><a href="#minus-2">minus/2</a></td><td>Subtracts two bigdec numbers by matching scale if necessary.</td></tr>
-<tr><td valign="top"><a href="#mult-2">mult/2</a></td><td>Multiply two bigdec numbers and strip zeros if necessary.</td></tr>
+<tr><td valign="top"><a href="#minus-2">minus/2</a></td><td>Equivalent to <a href="bigdec_arith.html#minus-2"><tt>bigdec_arith:minus(Number1, Number2)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#mult-2">mult/2</a></td><td>Equivalent to <a href="bigdec_arith.html#mult-2"><tt>bigdec_arith:mult(Number1, Number2)</tt></a>.
+</td></tr>
 <tr><td valign="top"><a href="#neg-1">neg/1</a></td><td>Equivalent to <a href="bigdec_transform.html#neg-1"><tt>bigdec_transform:neg(Number)</tt></a>.
 </td></tr>
 <tr><td valign="top"><a href="#one-0">one/0</a></td><td>Equivalent to <a href="bigdec_const.html#one-0"><tt>bigdec_const:one()</tt></a>.
@@ -83,11 +86,8 @@
 <h3 class="function"><a name="add-2">add/2</a></h3>
 <div class="spec">
 <p><tt>add(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
-</div><p><p>Add two bigdec numbers by matching scale if necessary.</p>
- 
-  If both numbers contain the same exp value, the resulting bigdec is the sum
-  of values adjusted by sign with the same exp. But if exp doesn't match we
-  need to match exp of each number.</p>
+</div><p>Equivalent to <a href="bigdec_arith.html#add-2"><tt>bigdec_arith:add(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="as_text-1">as_text/1</a></h3>
 <div class="spec">
@@ -184,19 +184,14 @@
 <h3 class="function"><a name="minus-2">minus/2</a></h3>
 <div class="spec">
 <p><tt>minus(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
-</div><p><p>Subtracts two bigdec numbers by matching scale if necessary.</p>
- 
-  The subtraction is a wrapper for inverting sign of Num2 and proceeding with
-  addition. This way we keep logic preserved.</p>
+</div><p>Equivalent to <a href="bigdec_arith.html#minus-2"><tt>bigdec_arith:minus(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="mult-2">mult/2</a></h3>
 <div class="spec">
 <p><tt>mult(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
-</div><p><p>Multiply two bigdec numbers and strip zeros if necessary.</p>
- 
-  Multiplication of bigdec numbers is made by multiplying its integer values
-  and adding exponent values. If resulting bigdec contains trailing zeros, than
-  we need to submit it for stripping zeros.</p>
+</div><p>Equivalent to <a href="bigdec_arith.html#mult-2"><tt>bigdec_arith:mult(Number1, Number2)</tt></a>.</p>
+
 
 <h3 class="function"><a name="neg-1">neg/1</a></h3>
 <div class="spec">
