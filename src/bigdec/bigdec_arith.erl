@@ -34,7 +34,7 @@
 %%%====================================================================================================================
 
 %% Arithmetic operations
--export([add/2, minus/2, mult/2]).
+-export([add/2, minus/2, mult/2, divide/2, divide/3, divide/4]).
 
 %%%====================================================================================================================
 %%% EUnit setup
@@ -56,6 +56,15 @@
 %%% pow(  #bigdec{}, integer)    -> #bigdec{}
 %%% rem(  #bigdec{}, #bigdec{})  -> #bigdec{}
 %%%
+%%% => Rounding Patterns
+%%% round_up        => Increments the digit prior to a nonzero discarded fraction
+%%% round_down      => Doesn't increment the digit prior to a discarded fraction (trunc)
+%%% round_ceiling   => Round towards positive infinity - if sign is pos act as round_up, if is neg act as round_down
+%%% round_floor     => Round towards negative infinity - if sign is pos act as round_down, it is neg act as round_up
+%%% round_half_up   => If the discarded fraction is >= 0.5, use round_up
+%%% round_half_down => If the discarded fraction is >  0.5, use round_up
+%%% round_half_even => If remainder digit from discard (left digit to the discarded fraction) is even, act as
+%%%                    round_half_up, otherwise use round_half_down
 %%%====================================================================================================================
 
 %%---------------------------------------------------------------------------------------------------------------------
@@ -125,6 +134,80 @@ mult(#bigdec{sign = S1, value = Val1, exp = Exp1}, #bigdec{sign = S2, value = Va
                                        value = ResultInt,
                                        exp   = ResultExp}).
 
+%%---------------------------------------------------------------------------------------------------------------------
+%% @doc Divide two bigdec numbers and strip zeros if necessary using default context.
+%%
+%% If no math context is given, then defaults are used as rounding mode to round_half_up and maximum exponent to 30
+%% decimal places. The maximum exponent is discarded if one of the operands at the division has a bigger exponent.
+%% @end
+%%---------------------------------------------------------------------------------------------------------------------
+-spec divide(Numerator :: bigdec:bigdec(), Denominator :: bigdec:bigdec()) -> Result :: bigdec:bigdec().
+divide(Numerator = #bigdec{}, Denominator = #bigdec{}) ->
+  divide(Numerator, Denominator, round_half_up, 30).
+
+%%---------------------------------------------------------------------------------------------------------------------
+%% @doc Divide two bigdec numbers and strip zeros if necessary using partial math context.
+%%
+%% If only partial math context is given, then defaults are used as rounding mode to round_half_up and maximum exponent
+%% to 30 decimal places.
+%% @end
+%%---------------------------------------------------------------------------------------------------------------------
+-spec divide(Numerator :: bigdec:bigdec(), Denominator :: bigdec:bigdec(), MathContext :: integer() | atom()) -> Result :: bigdec:bigdec().
+divide(Numerator = #bigdec{}, Denominator = #bigdec{}, MaxExponent) when is_integer(MaxExponent) ->
+  divide(Numerator, Denominator, round_half_up, MaxExponent);
+divide(Numerator = #bigdec{}, Denominator = #bigdec{}, RoundingMode) when is_atom(RoundingMode) ->
+  divide(Numerator, Denominator, RoundingMode, 30).
+
+%%---------------------------------------------------------------------------------------------------------------------
+%% @doc Divide two bigdec numbers and strip zeros if necessary using math context.
+%%
+%% Division is applied by equalizing exponents of both operands and discarding respective exponent. New exponent is
+%% later applied using either MaxExponent, or the original exponent if it is bigger. The result is stripped of trailing
+%% zeros for more concise result.
+%% @see bigdec_common:hlp_apply_round/4. hlp_apply_round/4 at bigdec_common for information on rounding methods.
+%% @end
+%%---------------------------------------------------------------------------------------------------------------------
+-spec divide(Numerator :: bigdec:bigdec(), Denominator :: bigdec:bigdec(), RoundingMode :: atom(), MaxExponent :: integer()) -> Result :: bigdec:bigdec().
+divide(Numerator = #bigdec{}, Denominator = #bigdec{}, RoundingMode, MaxExponent) ->
+
+  %% Adjust exponents
+  {_, MatchNumerator, MatchDenominator} = bigdec_comp:match_exp(Numerator, Denominator),
+
+  %% Get the resulting sign for the operation
+  ResultSign = case {MatchNumerator#bigdec.sign, MatchDenominator#bigdec.sign} of
+                 {0, 0} -> 0;
+                 {0, 1} -> 1;
+                 {1, 0} -> 1;
+                 {1, 1} -> 0
+               end,
+
+  %% Define adjustment - since the exponent is equal we can ignore it and define a new adjustment
+  %% Because 1 * 10 ^ -2 / 2 * 10 ^ -2 == 1 / 2
+  AdjustingExponent = case MatchDenominator#bigdec.exp > MaxExponent of
+                        true  -> MatchDenominator#bigdec.exp;
+                        false -> MaxExponent
+                      end,
+
+  %% Adjust numerator for new exponent
+  AdjustedNumerator = MatchNumerator#bigdec.value * bigdec_common:hlp_pow(10, AdjustingExponent),
+
+  %% Now we can get the result by integer division
+  DivisionResult = AdjustedNumerator div MatchDenominator#bigdec.value,
+
+  %% Now we get the next digit that will be truncated
+  TruncatedDigit = (((AdjustedNumerator rem MatchDenominator#bigdec.value) * 10) div MatchDenominator#bigdec.value),
+
+  %% Now we apply rounding mode to truncated digit to define division result
+  AdjustedResult = bigdec_common:hlp_apply_round(RoundingMode, ResultSign, DivisionResult, TruncatedDigit),
+
+  %% Now we create a new BigDec composed by these new data
+  ResultBigDec = #bigdec{sign = ResultSign, value = AdjustedResult, exp = AdjustingExponent},
+
+  %% Now we return stripped result
+  bigdec_transform:strip_zeros(ResultBigDec).
+
+
+
 %%%====================================================================================================================
 %%% EUnit Tests
 %%%====================================================================================================================
@@ -188,5 +271,55 @@ mult_test() ->
   ?assertEqual(     #bigdec{sign = 0, value = 3006, exp = 2},
                mult(#bigdec{sign = 1, value =    3, exp = 1},
                     #bigdec{sign = 1, value = 1002, exp = 1})).
+
+divide_test() ->
+  %% 0.4 / 0.02 = 20
+  ?assertEqual(       #bigdec{sign = 0, value = 20, exp = 0},
+               divide(#bigdec{sign = 0, value =  4, exp = 1},
+                      #bigdec{sign = 0, value =  2, exp = 2})),
+  %% 0.02 / 0.4 = 0.05
+  ?assertEqual(       #bigdec{sign = 0, value = 5, exp = 2},
+               divide(#bigdec{sign = 0, value = 2, exp = 2},
+                      #bigdec{sign = 0, value = 4, exp = 1})),
+  %% 0.00003 / -0.000000000075 = -400_000
+  ?assertEqual(       #bigdec{sign = 1, value = 400000, exp =  0},
+               divide(#bigdec{sign = 0, value =      3, exp =  5},
+                      #bigdec{sign = 1, value =     75, exp = 12})),
+  %% -3.75 / -4.683 = 0,80076873798 | TRUNC 8 - Context round_down 11
+  ?assertEqual(       #bigdec{sign = 0, value = 80076873798, exp = 11},
+               divide(#bigdec{sign = 1, value =         375, exp =  2},
+                      #bigdec{sign = 1, value =        4683, exp =  3}, round_down, 11)),
+  %% -3.75 / 4.683 = -0,80076873799 | TRUNC 8 - Context round_up 11
+  ?assertEqual(       #bigdec{sign = 1, value = 80076873799, exp = 11},
+               divide(#bigdec{sign = 1, value =         375, exp =  2},
+                      #bigdec{sign = 0, value =        4683, exp =  3}, round_up, 11)),
+  %% -3 / 7 = -0,428571428 | TRUNC 5 - Context round_half_down 9
+  ?assertEqual(       #bigdec{sign = 1, value = 428571428, exp = 9},
+               divide(#bigdec{sign = 1, value =         3, exp = 0},
+                      #bigdec{sign = 0, value =         7, exp = 0}, round_half_down, 9)),
+  %% -3 / 7 = -0,428571429 | TRUNC 5 - Context round_half_up 9
+  ?assertEqual(       #bigdec{sign = 1, value = 428571429, exp = 9},
+               divide(#bigdec{sign = 1, value =         3, exp = 0},
+                      #bigdec{sign = 0, value =         7, exp = 0}, round_half_up, 9)),
+  %% -3 / 7 = -0,428571428 | TRUNC 5 - Context round_ceiling 9
+  ?assertEqual(       #bigdec{sign = 1, value = 428571428, exp = 9},
+               divide(#bigdec{sign = 1, value =         3, exp = 0},
+                      #bigdec{sign = 0, value =         7, exp = 0}, round_ceiling, 9)),
+  %% 3 / 7 = 0,428571429 | TRUNC 5 - Context round_ceiling 9
+  ?assertEqual(       #bigdec{sign = 0, value = 428571429, exp = 9},
+               divide(#bigdec{sign = 0, value =         3, exp = 0},
+                      #bigdec{sign = 0, value =         7, exp = 0}, round_ceiling, 9)),
+  %% -3 / 7 = -0,428571428 | TRUNC 5 - Context round_half_even 9
+  ?assertEqual(       #bigdec{sign = 1, value = 428571428, exp = 9},
+               divide(#bigdec{sign = 1, value =         3, exp = 0},
+                      #bigdec{sign = 0, value =         7, exp = 0}, round_half_even, 9)),
+  %% -3 / 7 = -0,42857143 | TRUNC 8 - Context round_half_even 8
+  ?assertEqual(       #bigdec{sign = 1, value = 42857143, exp = 8},
+               divide(#bigdec{sign = 1, value =        3, exp = 0},
+                      #bigdec{sign = 0, value =        7, exp = 0}, round_half_even, 8)),
+  %% -3 / 7 = -0,4285714 | TRUNC 2 - Context round_half_even 7
+  ?assertEqual(       #bigdec{sign = 1, value = 4285714, exp = 7},
+               divide(#bigdec{sign = 1, value =       3, exp = 0},
+                      #bigdec{sign = 0, value =       7, exp = 0}, round_half_even, 7)).
 
 -endif.

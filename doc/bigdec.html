@@ -35,6 +35,13 @@
 </td></tr>
 <tr><td valign="top"><a href="#contains_integer-1">contains_integer/1</a></td><td>Equivalent to <a href="bigdec_comp.html#contains_integer-1"><tt>bigdec_comp:contains_integer(Number)</tt></a>.
 </td></tr>
+<tr><td valign="top"><a href="#divide-2">divide/2</a></td><td>Equivalent to <a href="bigdec_arith.html#divide-2"><tt>bigdec_arith:divide(Number1, Number2)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#divide-3">divide/3</a></td><td>Equivalent to <a href="bigdec_arith.html#divide-3"><tt>bigdec_arith:divide(Number1, Number2, MathContext)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#divide-4">divide/4</a></td><td>Equivalent to <a href="bigdec_arith.html#divide-4"><tt>bigdec_arith:divide(Number1, Number2, RoundingMode,
+		    MaxExponent)</tt></a>.
+</td></tr>
 <tr><td valign="top"><a href="#exponent_val-1">exponent_val/1</a></td><td>Equivalent to <a href="bigdec_analysis.html#exponent_val-1"><tt>bigdec_analysis:exponent_val(Number)</tt></a>.
 </td></tr>
 <tr><td valign="top"><a href="#is_equal-2">is_equal/2</a></td><td>Equivalent to <a href="bigdec_comp.html#is_equal-2"><tt>bigdec_comp:is_equal(Number1, Number2)</tt></a>.
@@ -107,6 +114,25 @@
 <div class="spec">
 <p><tt>contains_integer(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::true | false</tt><br></p>
 </div><p>Equivalent to <a href="bigdec_comp.html#contains_integer-1"><tt>bigdec_comp:contains_integer(Number)</tt></a>.</p>
+
+
+<h3 class="function"><a name="divide-2">divide/2</a></h3>
+<div class="spec">
+<p><tt>divide(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
+</div><p>Equivalent to <a href="bigdec_arith.html#divide-2"><tt>bigdec_arith:divide(Number1, Number2)</tt></a>.</p>
+
+
+<h3 class="function"><a name="divide-3">divide/3</a></h3>
+<div class="spec">
+<p><tt>divide(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>, MathContext::non_neg_integer() | atom()) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
+</div><p>Equivalent to <a href="bigdec_arith.html#divide-3"><tt>bigdec_arith:divide(Number1, Number2, MathContext)</tt></a>.</p>
+
+
+<h3 class="function"><a name="divide-4">divide/4</a></h3>
+<div class="spec">
+<p><tt>divide(Number1::<a href="#type-bigdec">bigdec()</a>, Number2::<a href="#type-bigdec">bigdec()</a>, RoundingMode::atom(), MaxExponent::non_neg_integer()) -&gt; Result::<a href="#type-bigdec">bigdec()</a></tt><br></p>
+</div><p>Equivalent to <a href="bigdec_arith.html#divide-4"><tt>bigdec_arith:divide(Number1, Number2, RoundingMode,
+		    MaxExponent)</tt></a>.</p>
 
 
 <h3 class="function"><a name="exponent_val-1">exponent_val/1</a></h3>

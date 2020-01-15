@@ -47,7 +47,7 @@
 -export([as_text/1]).
 
 %% bigdec_arith module
--export([add/2, minus/2, mult/2]).
+-export([add/2, minus/2, mult/2, divide/2, divide/3, divide/4]).
 
 %% bigdec_transform module
 -export([neg/1, strip_zeros/1]).
@@ -135,6 +135,37 @@ minus(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_arith:minus(Num1, Num2).
 %% @equiv bigdec_arith:mult(Number1, Number2)
 -spec mult(Number1 :: bigdec(), Number2 :: bigdec()) -> Result :: bigdec().
 mult(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_arith:mult(Num1, Num2).
+
+%% @equiv bigdec_arith:divide(Number1, Number2)
+-spec divide(Number1 :: bigdec(), Number2 :: bigdec()) -> Result :: bigdec().
+divide(Num1 = #bigdec{}, Num2 = #bigdec{}) -> bigdec_arith:divide(Num1, Num2).
+
+%% @equiv bigdec_arith:divide(Number1, Number2, MathContext)
+-spec divide(Number1 :: bigdec(),
+             Number2 :: bigdec(),
+             MathContext :: non_neg_integer() | atom()) -> Result :: bigdec().
+%% When we receive maximum exponent for division
+divide(Num1 = #bigdec{},
+       Num2 = #bigdec{},
+       MaxExponent) when is_integer(MaxExponent) ->
+  bigdec_arith:divide(Num1, Num2, MaxExponent);
+
+%% When we receive rounding mode to use
+divide(Num1 = #bigdec{},
+       Num2 = #bigdec{},
+       RoundingMode) when is_atom(RoundingMode) ->
+  bigdec_arith:divide(Num1, Num2, RoundingMode).
+
+%% @equiv bigdec_arith:divide(Number1, Number2, RoundingMode, MaxExponent)
+-spec divide(Number1 :: bigdec(),
+             Number2 :: bigdec(),
+             RoundingMode :: atom(),
+             MaxExponent :: non_neg_integer()) -> Result :: bigdec().
+divide(Num1 = #bigdec{},
+       Num2 = #bigdec{},
+       RoundingMode,
+       MaxExponent) ->
+  bigdec_arith:divide(Num1, Num2, RoundingMode, MaxExponent).
 
 %%%====================================================================================================================
 %%% Library public API for module bigdec_transform

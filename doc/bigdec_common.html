@@ -33,11 +33,35 @@
    Defines common utility functions and helpers to be used internally on the
    library. These functions are not supposed to be used outside of bidec app.
 <h2><a name="index">Function Index</a></h2>
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#hlp_pow-2">hlp_pow/2</a></td><td>Calculates exponentiation by squaring with big integers.</td></tr>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#hlp_apply_round-4">hlp_apply_round/4</a></td><td>Applies rounding mode to digit according to next truncated digit and rounding method.</td></tr>
+<tr><td valign="top"><a href="#hlp_int_division-2">hlp_int_division/2</a></td><td>Divide 2 integers and return also remainder of division.</td></tr>
+<tr><td valign="top"><a href="#hlp_pow-2">hlp_pow/2</a></td><td>Calculates exponentiation by squaring with big integers.</td></tr>
 <tr><td valign="top"><a href="#hlp_prepend_zeros-2">hlp_prepend_zeros/2</a></td><td>Generates string containing leading zeros for formatting.</td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="hlp_apply_round-4">hlp_apply_round/4</a></h3>
+<div class="spec">
+<p><tt>hlp_apply_round(RoundingMode::atom(), Sign::0 | 1, Digit::non_neg_integer(), NextDigit::non_neg_integer()) -&gt; Result::non_neg_integer()</tt><br></p>
+</div><p><p>Applies rounding mode to digit according to next truncated digit and rounding method.</p>
+ 
+  =&gt; Rounding Patterns
+  round_up        =&gt; Increments the digit prior to a nonzero discarded fraction
+  round_down      =&gt; Doesn't increment the digit prior to a discarded fraction (trunc)
+  round_ceiling   =&gt; Round towards positive infinity - if sign is pos act as round_up, if is neg act as round_down
+  round_floor     =&gt; Round towards negative infinity - if sign is pos act as round_down, it is neg act as round_up
+  round_half_up   =&gt; If the discarded fraction is &gt;= 0.5, use round_up
+  round_half_down =&gt; If the discarded fraction is &gt;  0.5, use round_up
+  round_half_even =&gt; If remainder digit from discard (left digit to the discarded fraction) is even, act as
+                     round_half_up, otherwise use round_half_down</p>
+
+<h3 class="function"><a name="hlp_int_division-2">hlp_int_division/2</a></h3>
+<div class="spec">
+<p><tt>hlp_int_division(Dividend::integer(), Divisor::integer()) -&gt; {Quotient::integer(), Remainder::integer()}</tt><br></p>
+</div><p><p>Divide 2 integers and return also remainder of division.</p>
+ 
+  For bigdec division we need to iterate through the division to check for the next digits of division.</p>
 
 <h3 class="function"><a name="hlp_pow-2">hlp_pow/2</a></h3>
 <div class="spec">

@@ -62,18 +62,6 @@
 %% incr_exp(#bigdec{})                                -> #bigdec{}
 %% decr_exp(#bigdec{})                                -> #bigdec{}
 %%
-%% => Rounding Patterns
-%% round_up        => Increments the digit prior to a nonzero discarded fraction
-%% round_down      => Doesn't increment the digit prior to a discarded fraction (trunc)
-%% round_ceiling   => Round towards positive infinity - if sign is positive act as
-%%                    round_up, if is negative act as round_down
-%% round_floor     => Round towards negative infinity - if sign is positive act as
-%%                    round_down, it is negative act as round_up
-%% round_half_up   => If the discarded fraction is >= 0.5, use round_up
-%% round_half_down => If the discarded fraction is >  0.5, use round_up
-%% round_half_even => If remainder digit from discard (left digit to the discarded fraction)
-%%                    is even, act as round_half_up, otherwise use round_half_down
-%%
 %%=============================================================================
 
 %%-----------------------------------------------------------------------------

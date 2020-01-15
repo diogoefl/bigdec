@@ -30,6 +30,9 @@
    Defines arithmetic operations among bigdec numbers.
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add-2">add/2</a></td><td>Add two bigdec numbers by matching scale if necessary.</td></tr>
+<tr><td valign="top"><a href="#divide-2">divide/2</a></td><td>Divide two bigdec numbers and strip zeros if necessary using default context.</td></tr>
+<tr><td valign="top"><a href="#divide-3">divide/3</a></td><td>Divide two bigdec numbers and strip zeros if necessary using partial math context.</td></tr>
+<tr><td valign="top"><a href="#divide-4">divide/4</a></td><td>Divide two bigdec numbers and strip zeros if necessary using math context.</td></tr>
 <tr><td valign="top"><a href="#minus-2">minus/2</a></td><td>Subtracts two bigdec numbers by matching scale if necessary.</td></tr>
 <tr><td valign="top"><a href="#mult-2">mult/2</a></td><td>Multiply two bigdec numbers and strip zeros if necessary.</td></tr>
 </table>
@@ -43,6 +46,32 @@
  
   If both numbers contain the same exp value, the resulting bigdec is the sum of values adjusted by sign with the same
   exp. But if exp doesn't match we need to match exp of each number.</p>
+
+<h3 class="function"><a name="divide-2">divide/2</a></h3>
+<div class="spec">
+<p><tt>divide(Numerator::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>, Denominator::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>) -&gt; Result::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a></tt><br></p>
+</div><p><p>Divide two bigdec numbers and strip zeros if necessary using default context.</p>
+ 
+  If no math context is given, then defaults are used as rounding mode to round_half_up and maximum exponent to 30
+  decimal places. The maximum exponent is discarded if one of the operands at the division has a bigger exponent.</p>
+
+<h3 class="function"><a name="divide-3">divide/3</a></h3>
+<div class="spec">
+<p><tt>divide(Numerator::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>, Denominator::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>, MathContext::integer() | atom()) -&gt; Result::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a></tt><br></p>
+</div><p><p>Divide two bigdec numbers and strip zeros if necessary using partial math context.</p>
+ 
+  If only partial math context is given, then defaults are used as rounding mode to round_half_up and maximum exponent
+  to 30 decimal places.</p>
+
+<h3 class="function"><a name="divide-4">divide/4</a></h3>
+<div class="spec">
+<p><tt>divide(Numerator::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>, Denominator::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>, RoundingMode::atom(), MaxExponent::integer()) -&gt; Result::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a></tt><br></p>
+</div><p><p>Divide two bigdec numbers and strip zeros if necessary using math context.</p>
+ 
+  Division is applied by equalizing exponents of both operands and discarding respective exponent. New exponent is
+  later applied using either MaxExponent, or the original exponent if it is bigger. The result is stripped of trailing
+  zeros for more concise result.</p>
+<p><b>See also:</b> <a href="bigdec_common.html#hlp_apply_round-4">hlp_apply_round/4 at bigdec_common for information on rounding methods.</a>.</p>
 
 <h3 class="function"><a name="minus-2">minus/2</a></h3>
 <div class="spec">
