@@ -57,7 +57,7 @@
 %% round(#bigdec{}, rounding_pattern)                 -> #bigdec{}
 %% change_exp(#bigdec{}, integer())                   -> #bigdec{}
 %% change_exp(#bigdec{}, integer(), rounding_pattern) -> #bigdec{}
-%% strip_zeros(#bigdec{})                             -> #bigdec{}
+%% strip_zeros(#bigdec{})                             -> #bigdec{} (DONE)
 %% rescale_by(#bigdec{}, integer())                   -> #bigdec{}
 %% incr_exp(#bigdec{})                                -> #bigdec{}
 %% decr_exp(#bigdec{})                                -> #bigdec{}

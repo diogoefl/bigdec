@@ -27,13 +27,34 @@
 %%% Data Structures
 %%%====================================================================================================================
 -include("bigdec.hrl").
--export_type([bigdec/0]).
--type     bigdec() :: #bigdec{sign  :: 0 | 1,
-                              value :: non_neg_integer(),
-                              exp   :: non_neg_integer()}.
+-export_type([bigdec/0, rounding_mode/0]).
+
+-type bigdec() :: #bigdec{sign  :: 0 | 1,
+                          value :: non_neg_integer(),
+                          exp   :: non_neg_integer()}.
 %% bigdec() defines tuple object representing a BigDec number. The data structure of bigdec is formed by 3 elements:
 %% sign, integer value and exponent. These three elements form the definition of the number based on the following
 %% formula: (Sign * -1) * IntValue * (10 ^ Exp).
+
+-type rounding_mode() :: round_up
+                       | round_down
+                       | round_ceiling
+                       | round_floor
+                       | round_half_up
+                       | round_half_down
+                       | round_half_even.
+%% rounding_mode() defines atom object representing possible methods for rounding during division operations. The
+%% values can be composed of different options as the following items:
+%% <ul>
+%%    <li>round_up : Increments the digit prior to a nonzero discarded fraction</li>
+%%    <li>round_down : Doesn't increment the digit prior to a discarded fraction (trunc)</li>
+%%    <li>round_ceiling : Round towards positive infinity - if sign is pos act as round_up, if is neg act as round_down</li>
+%%    <li>round_floor : Round towards negative infinity - if sign is pos act as round_down, it is neg act as round_up</li>
+%%    <li>round_half_up : If the discarded fraction is >= 0.5, use round_up</li>
+%%    <li>round_half_down : If the discarded fraction is >  0.5, use round_up</li>
+%%    <li>round_half_even : If remainder digit from discard (left digit to the discarded fraction) is even, act as round_half_up, otherwise use round_half_down</li>
+%% </ul>
+%% If no rounding_mode is provided during operations the default mode is round_half_up.
 
 %%%====================================================================================================================
 %%% Module setup
@@ -70,54 +91,12 @@
 -endif.
 
 %%%====================================================================================================================
-%%% Library implementation
+%%% Library public API for module bigdec_conv
 %%%====================================================================================================================
 
-
-%%=============================================================================
-%% Library public functions - Conversions to bigdec
-%%
-%% Planned functions to be implemented
-%% => Conversions to bigdec
-%% parse(string | bitstring | float | integer)            -> #bigdec{}
-%% parse(string | bitstring | float | integer, {options}) -> #bigdec{}
-%%=============================================================================
-
-
-%%=============================================================================
-%% Library public functions - Conversions from bigdec
-%%
-%% Planned functions to be implemented
-%% => Conversion from bigdec
-%% as_float(#bigdec{})            -> float
-%% as_float(#bigdec{}, {options}) -> float
-%% as_text(#bigdec{})             -> bitstring           (DONE)
-%% as_text(#bigdec{}, {options})  -> bitstring | string
-%%
-%%=============================================================================
-
-%%-----------------------------------------------------------------------------
-%% @doc Convert bigdec representation as text.
-%%
-%% Using calculation of Value * (Sign * -1) * 10 ^ Exp return the format of a
-%% bitstring representing the bigdec data.
-%% @end
-%%-----------------------------------------------------------------------------
+%% @equiv bigdec_conv:as_text(Number)
 -spec as_text(Number :: bigdec()) -> Result :: <<>>.
-as_text(Num = #bigdec{}) ->
-  #bigdec{sign  = Sign,
-          value = Value,
-          exp   = Exp   } = strip_zeros(Num),
-  ValueString             = integer_to_list(Value),
-  Length                  = string:length(ValueString),
-  LeadingZerosNeeded      = Exp - Length + 1,
-  FullValueString         = bigdec_common:hlp_prepend_zeros(ValueString, LeadingZerosNeeded),
-  DotLeadingPosition      = string:length(FullValueString) - Exp,
-  {IntPart, DecPart}      = lists:split(DotLeadingPosition, FullValueString),
-  case Sign of
-    0 -> list_to_bitstring(       IntPart ++ "." ++ DecPart);
-    1 -> list_to_bitstring("-" ++ IntPart ++ "." ++ DecPart)
-  end.
+as_text(Num = #bigdec{}) -> bigdec_conv:as_text(Num).
 
 %%%====================================================================================================================
 %%% Library public API for module bigdec_arith
@@ -348,11 +327,6 @@ bitstring_processing(validate, Value) ->
 %%=============================================================================
 
 -ifdef(TEST).
-
-as_text_test() ->
-  ?assertEqual(<<"0.23453">>, as_text(#bigdec{sign = 0, value = 23453, exp = 5})),
-  ?assertEqual(<<"-10.54">>,  as_text(#bigdec{sign = 1, value = 10540, exp = 3})),
-  ?assertEqual(<<"-0.0001">>, as_text(#bigdec{sign = 1, value =     1, exp = 4})).
 
 float_to_bitstring_test() ->
   ?assertEqual(<<"2.20000000000000">>, float_to_bitstring(2.2)),

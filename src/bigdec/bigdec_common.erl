@@ -100,18 +100,19 @@ hlp_int_division(Dividend, Divisor) ->
 %%---------------------------------------------------------------------------------------------------------------------
 %% @doc Applies rounding mode to digit according to next truncated digit and rounding method.
 %%
-%% => Rounding Patterns
-%% round_up        => Increments the digit prior to a nonzero discarded fraction
-%% round_down      => Doesn't increment the digit prior to a discarded fraction (trunc)
-%% round_ceiling   => Round towards positive infinity - if sign is pos act as round_up, if is neg act as round_down
-%% round_floor     => Round towards negative infinity - if sign is pos act as round_down, it is neg act as round_up
-%% round_half_up   => If the discarded fraction is >= 0.5, use round_up
-%% round_half_down => If the discarded fraction is >  0.5, use round_up
-%% round_half_even => If remainder digit from discard (left digit to the discarded fraction) is even, act as
-%%                    round_half_up, otherwise use round_half_down
+%% === Rounding Patterns ===
+%% <ul>
+%% <li>round_up        => Increments the digit prior to a nonzero discarded fraction</li>
+%% <li>round_down      => Doesn't increment the digit prior to a discarded fraction (trunc)</li>
+%% <li>round_ceiling   => Round towards positive infinity - if sign is pos act as round_up, if is neg act as round_down</li>
+%% <li>round_floor     => Round towards negative infinity - if sign is pos act as round_down, it is neg act as round_up</li>
+%% <li>round_half_up   => If the discarded fraction is >= 0.5, use round_up</li>
+%% <li>round_half_down => If the discarded fraction is >  0.5, use round_up</li>
+%% <li>round_half_even => If remainder digit from discard (left digit to the discarded fraction) is even, act as round_half_up, otherwise use round_half_down</li>
+%% </ul>
 %% @end
 %%---------------------------------------------------------------------------------------------------------------------
--spec hlp_apply_round(RoundingMode :: atom(), Sign :: 0 | 1, Digit :: non_neg_integer(), NextDigit :: non_neg_integer()) -> Result :: non_neg_integer().
+-spec hlp_apply_round(RoundingMode :: bigdec:rounding_mode(), Sign :: 0 | 1, Digit :: non_neg_integer(), NextDigit :: non_neg_integer()) -> Result :: non_neg_integer().
 hlp_apply_round(round_up,        _, Digit,    _)                      -> Digit + 1;
 hlp_apply_round(round_down,      _, Digit,    _)                      -> Digit;
 hlp_apply_round(round_ceiling,   0, Digit, Next)                      -> hlp_apply_round(round_up, 0, Digit, Next);

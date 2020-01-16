@@ -1,8 +1,5 @@
-%%%--------------------------------------------------------------------------------------------------------------------
-%%% BigDec Library Arithmetic
-%%%
-%%% @author diogoefl
-%%% @copyright (diogoefl) 2020. All Rights Reserved.
+%%%= LICENSE INFORMATION START ========================================================================================
+%%% BigDec Library
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 %%% the License. You may obtain a copy of the License at
@@ -12,34 +9,32 @@
 %%% Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
 %%% an "AS IS" basis, without warranties or conditions of any kind, either express or implied. See the License for the
 %%% specific language governing permissions and limitations under the License.
-%%%
+%%%= LICENSE INFORMATION END===========================================================================================
+
+%%%--------------------------------------------------------------------------------------------------------------------
 %%% @doc Arbitrary Precision Decimal Arithmetic.
 %%%
 %%% Defines arithmetic operations among bigdec numbers.
+%%% @author diogoefl
+%%% @copyright (diogoefl) 2020. All Rights Reserved.
 %%% @end
-%%%
 %%%--------------------------------------------------------------------------------------------------------------------
-
 -module(bigdec_arith).
 %% @headerfile ["bigdec.hrl"]
 
 %%%====================================================================================================================
 %%% Data Structures
 %%%====================================================================================================================
-
 -include("bigdec.hrl").
 
 %%%====================================================================================================================
 %%% Module setup
 %%%====================================================================================================================
-
-%% Arithmetic operations
 -export([add/2, minus/2, mult/2, divide/2, divide/3, divide/4]).
 
 %%%====================================================================================================================
 %%% EUnit setup
 %%%====================================================================================================================
-
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 -endif.
@@ -52,7 +47,7 @@
 %%% add(  #bigdec{}, #bigdec{})  -> #bigdec{} (DONE)
 %%% minus(#bigdec{}, #bigdec{})  -> #bigdec{} (DONE)
 %%% mult( #bigdec{}, #bigdec{})  -> #bigdec{} (DONE)
-%%% div(  #bigdec{}, #bigdec{})  -> #bigdec{}
+%%% div(  #bigdec{}, #bigdec{})  -> #bigdec{} (DONE)
 %%% pow(  #bigdec{}, integer)    -> #bigdec{}
 %%% rem(  #bigdec{}, #bigdec{})  -> #bigdec{}
 %%%
@@ -141,7 +136,8 @@ mult(#bigdec{sign = S1, value = Val1, exp = Exp1}, #bigdec{sign = S2, value = Va
 %% decimal places. The maximum exponent is discarded if one of the operands at the division has a bigger exponent.
 %% @end
 %%---------------------------------------------------------------------------------------------------------------------
--spec divide(Numerator :: bigdec:bigdec(), Denominator :: bigdec:bigdec()) -> Result :: bigdec:bigdec().
+-spec divide(Numerator   :: bigdec:bigdec(),
+             Denominator :: bigdec:bigdec()) -> Result :: bigdec:bigdec().
 divide(Numerator = #bigdec{}, Denominator = #bigdec{}) ->
   divide(Numerator, Denominator, round_half_up, 30).
 
@@ -152,7 +148,9 @@ divide(Numerator = #bigdec{}, Denominator = #bigdec{}) ->
 %% to 30 decimal places.
 %% @end
 %%---------------------------------------------------------------------------------------------------------------------
--spec divide(Numerator :: bigdec:bigdec(), Denominator :: bigdec:bigdec(), MathContext :: integer() | atom()) -> Result :: bigdec:bigdec().
+-spec divide(Numerator   :: bigdec:bigdec(),
+             Denominator :: bigdec:bigdec(),
+             MathContext :: integer() | atom()) -> Result :: bigdec:bigdec().
 divide(Numerator = #bigdec{}, Denominator = #bigdec{}, MaxExponent) when is_integer(MaxExponent) ->
   divide(Numerator, Denominator, round_half_up, MaxExponent);
 divide(Numerator = #bigdec{}, Denominator = #bigdec{}, RoundingMode) when is_atom(RoundingMode) ->
@@ -167,12 +165,13 @@ divide(Numerator = #bigdec{}, Denominator = #bigdec{}, RoundingMode) when is_ato
 %% @see bigdec_common:hlp_apply_round/4. hlp_apply_round/4 at bigdec_common for information on rounding methods.
 %% @end
 %%---------------------------------------------------------------------------------------------------------------------
--spec divide(Numerator :: bigdec:bigdec(), Denominator :: bigdec:bigdec(), RoundingMode :: atom(), MaxExponent :: integer()) -> Result :: bigdec:bigdec().
+-spec divide(Numerator    :: bigdec:bigdec(),
+             Denominator  :: bigdec:bigdec(),
+             RoundingMode :: atom(),
+             MaxExponent  :: integer()) -> Result :: bigdec:bigdec().
 divide(Numerator = #bigdec{}, Denominator = #bigdec{}, RoundingMode, MaxExponent) ->
-
   %% Adjust exponents
   {_, MatchNumerator, MatchDenominator} = bigdec_comp:match_exp(Numerator, Denominator),
-
   %% Get the resulting sign for the operation
   ResultSign = case {MatchNumerator#bigdec.sign, MatchDenominator#bigdec.sign} of
                  {0, 0} -> 0;
@@ -180,33 +179,24 @@ divide(Numerator = #bigdec{}, Denominator = #bigdec{}, RoundingMode, MaxExponent
                  {1, 0} -> 1;
                  {1, 1} -> 0
                end,
-
   %% Define adjustment - since the exponent is equal we can ignore it and define a new adjustment
   %% Because 1 * 10 ^ -2 / 2 * 10 ^ -2 == 1 / 2
   AdjustingExponent = case MatchDenominator#bigdec.exp > MaxExponent of
                         true  -> MatchDenominator#bigdec.exp;
                         false -> MaxExponent
                       end,
-
   %% Adjust numerator for new exponent
   AdjustedNumerator = MatchNumerator#bigdec.value * bigdec_common:hlp_pow(10, AdjustingExponent),
-
-  %% Now we can get the result by integer division
+  %% Get the result by integer division
   DivisionResult = AdjustedNumerator div MatchDenominator#bigdec.value,
-
-  %% Now we get the next digit that will be truncated
+  %% Get the next digit that will be truncated
   TruncatedDigit = (((AdjustedNumerator rem MatchDenominator#bigdec.value) * 10) div MatchDenominator#bigdec.value),
-
-  %% Now we apply rounding mode to truncated digit to define division result
+  %% Apply rounding mode to truncated digit to define division result
   AdjustedResult = bigdec_common:hlp_apply_round(RoundingMode, ResultSign, DivisionResult, TruncatedDigit),
-
-  %% Now we create a new BigDec composed by these new data
+  %% Create a new BigDec composed by these new data
   ResultBigDec = #bigdec{sign = ResultSign, value = AdjustedResult, exp = AdjustingExponent},
-
-  %% Now we return stripped result
+  %% Return stripped result
   bigdec_transform:strip_zeros(ResultBigDec).
-
-
 
 %%%====================================================================================================================
 %%% EUnit Tests

@@ -11,20 +11,7 @@
 
 <h1>Module bigdec_analysis</h1>
 <ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Arbitrary Precision Decimal Analysis.
-<p>Copyright © (diogoefl) 2020. All Rights Reserved.
-  
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-  
-       http://www.apache.org/licenses/LICENSE-2.0
-  
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" basis,
-   without warranties or conditions of any kind, either express or
-   implied. See the License for the specific language governing permissions
-   and limitations under the License.
-  `</p>
+<p>Copyright © (diogoefl) 2020. All Rights Reserved.</p>
 
 <p><b>Authors:</b> diogoefl.</p>
 
@@ -34,8 +21,7 @@
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#exponent_val-1">exponent_val/1</a></td><td>Value of exponent in bigdec number.</td></tr>
 <tr><td valign="top"><a href="#has_trailing_zeros-1">has_trailing_zeros/1</a></td><td>Validates if values of bigdec has trailing zeros.</td></tr>
-<tr><td valign="top"><a href="#precision_val-1">precision_val/1</a></td><td>Amount of digits of the unscaled valued for the bigdec, also known as  
-precision of bigdec.</td></tr>
+<tr><td valign="top"><a href="#precision_val-1">precision_val/1</a></td><td>Amount of digits of the unscaled valued for the bigdec, also known as precision of bigdec.</td></tr>
 <tr><td valign="top"><a href="#sign_val-1">sign_val/1</a></td><td>Atom defining sign for bigdec.</td></tr>
 <tr><td valign="top"><a href="#unscaled_val-1">unscaled_val/1</a></td><td>Value of unscaled integer representation not applying exponent power.</td></tr>
 </table>
@@ -47,39 +33,34 @@ precision of bigdec.</td></tr>
 <p><tt>exponent_val(Number::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>) -&gt; Result::integer()</tt><br></p>
 </div><p><p>Value of exponent in bigdec number.</p>
  
-  The exponent is the component N on the number representation of V * 10 ^ -N.
-  Exponent value in bigdec is neg against the representation, meaning that for
-  example 0.2 is represented as (2 * 10 ^ -1) and the exponent value is +1.</p>
+  The exponent is the component N on the number representation of V * 10 ^ -N. Exponent value in bigdec is neg against
+  the representation, meaning that for example 0.2 is represented as (2 * 10 ^ -1) and the exponent value is +1.</p>
 
 <h3 class="function"><a name="has_trailing_zeros-1">has_trailing_zeros/1</a></h3>
 <div class="spec">
 <p><tt>has_trailing_zeros(Number::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>) -&gt; Result::{true, Amount::integer()} | {false, 0}</tt><br></p>
 </div><p><p>Validates if values of bigdec has trailing zeros.</p>
  
-  Analyze bigdec value to check if it has trailing zeros. Since exp in our
-  data structure is not supposed to be negative, we need to check also if
-  the amount found of trailing zeros is bigger than our exp. It it is the
-  amount to be return needs to be equal to exp. Also if the value of bigdec is
-  equivalent to zero, we can't calculate the amount of trailing zeros so we
-  need to return the exp as result for stripping.</p>
+  Analyze bigdec value to check if it has trailing zeros. Since exp in our data structure is not supposed to be
+  negative, we need to check also if the amount found of trailing zeros is bigger than our exp. It it is the amount to
+  be return needs to be equal to exp. Also if the value of bigdec is equivalent to zero, we can't calculate the amount
+  of trailing zeros so we need to return the exp as result for stripping.</p>
 
 <h3 class="function"><a name="precision_val-1">precision_val/1</a></h3>
 <div class="spec">
 <p><tt>precision_val(Number::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>) -&gt; Result::non_neg_integer()</tt><br></p>
-</div><p><p>Amount of digits of the unscaled valued for the bigdec, also known as  
-precision of bigdec.</p>
+</div><p><p>Amount of digits of the unscaled valued for the bigdec, also known as precision of bigdec.</p>
  
-  Calculates the amount of digits found in the representation of the unscaled
-  value for the bigdec. This amount is not stripped of trailing zeros.</p>
+  Calculates the amount of digits found in the representation of the unscaled value for the bigdec. This amount is not
+  stripped of trailing zeros.</p>
 
 <h3 class="function"><a name="sign_val-1">sign_val/1</a></h3>
 <div class="spec">
 <p><tt>sign_val(Number::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>) -&gt; Result::positive | negative | invalid</tt><br></p>
 </div><p><p>Atom defining sign for bigdec.</p>
  
-  The sign used in bigdec structures use 0 for postive or zero numbers, and 1
-  for negative numbers. This functions returns atom positive if sign is 0 and
-  atom negative if sign is 1. If bigdec gets incorrect data and sign is not 0
+  The sign used in bigdec structures use 0 for positive or zero numbers, and 1 for negative numbers. This functions
+  returns atom positive if sign is 0 and atom negative if sign is 1. If bigdec gets incorrect data and sign is not 0
   or 1, than atom invalid is returned.</p>
 
 <h3 class="function"><a name="unscaled_val-1">unscaled_val/1</a></h3>
@@ -87,9 +68,8 @@ precision of bigdec.</p>
 <p><tt>unscaled_val(Number::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>) -&gt; Result::non_neg_integer()</tt><br></p>
 </div><p><p>Value of unscaled integer representation not applying exponent power.</p>
  
-  The unscaled value represents the number that multiplied by power of exp by
-  10 represents the real value of bigdec. The unscaled value is not stripped
-  of trailing zeros.</p>
+  The unscaled value represents the number that multiplied by power of exp by 10 represents the real value of bigdec.
+  The unscaled value is not stripped of trailing zeros.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>

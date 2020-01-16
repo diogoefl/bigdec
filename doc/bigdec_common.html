@@ -43,18 +43,19 @@
 
 <h3 class="function"><a name="hlp_apply_round-4">hlp_apply_round/4</a></h3>
 <div class="spec">
-<p><tt>hlp_apply_round(RoundingMode::atom(), Sign::0 | 1, Digit::non_neg_integer(), NextDigit::non_neg_integer()) -&gt; Result::non_neg_integer()</tt><br></p>
+<p><tt>hlp_apply_round(RoundingMode::<a href="bigdec.html#type-rounding_mode">bigdec:rounding_mode()</a>, Sign::0 | 1, Digit::non_neg_integer(), NextDigit::non_neg_integer()) -&gt; Result::non_neg_integer()</tt><br></p>
 </div><p><p>Applies rounding mode to digit according to next truncated digit and rounding method.</p>
  
-  =&gt; Rounding Patterns
-  round_up        =&gt; Increments the digit prior to a nonzero discarded fraction
-  round_down      =&gt; Doesn't increment the digit prior to a discarded fraction (trunc)
-  round_ceiling   =&gt; Round towards positive infinity - if sign is pos act as round_up, if is neg act as round_down
-  round_floor     =&gt; Round towards negative infinity - if sign is pos act as round_down, it is neg act as round_up
-  round_half_up   =&gt; If the discarded fraction is &gt;= 0.5, use round_up
-  round_half_down =&gt; If the discarded fraction is &gt;  0.5, use round_up
-  round_half_even =&gt; If remainder digit from discard (left digit to the discarded fraction) is even, act as
-                     round_half_up, otherwise use round_half_down</p>
+  <h4><a name="Rounding_Patterns">Rounding Patterns</a></h4>
+  <ul>
+  <li>round_up        =&gt; Increments the digit prior to a nonzero discarded fraction</li>
+  <li>round_down      =&gt; Doesn't increment the digit prior to a discarded fraction (trunc)</li>
+  <li>round_ceiling   =&gt; Round towards positive infinity - if sign is pos act as round_up, if is neg act as round_down</li>
+  <li>round_floor     =&gt; Round towards negative infinity - if sign is pos act as round_down, it is neg act as round_up</li>
+  <li>round_half_up   =&gt; If the discarded fraction is &gt;= 0.5, use round_up</li>
+  <li>round_half_down =&gt; If the discarded fraction is &gt;  0.5, use round_up</li>
+  <li>round_half_even =&gt; If remainder digit from discard (left digit to the discarded fraction) is even, act as round_half_up, otherwise use round_half_down</li>
+  </ul></p>
 
 <h3 class="function"><a name="hlp_int_division-2">hlp_int_division/2</a></h3>
 <div class="spec">

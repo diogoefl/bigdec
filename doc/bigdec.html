@@ -27,10 +27,26 @@
   sign, integer value and exponent. These three elements form the definition of the number based on the following
   formula: (Sign * -1) * IntValue * (10 ^ Exp).</p>
 
+<h3 class="typedecl"><a name="type-rounding_mode">rounding_mode()</a></h3>
+<p><tt>rounding_mode() = round_up | round_down | round_ceiling | round_floor | round_half_up | round_half_down | round_half_even</tt></p>
+<p>  rounding_mode() defines atom object representing possible methods for rounding during division operations. The
+  values can be composed of different options as the following items:
+  <ul>
+     <li>round_up : Increments the digit prior to a nonzero discarded fraction</li>
+     <li>round_down : Doesn't increment the digit prior to a discarded fraction (trunc)</li>
+     <li>round_ceiling : Round towards positive infinity - if sign is pos act as round_up, if is neg act as round_down</li>
+     <li>round_floor : Round towards negative infinity - if sign is pos act as round_down, it is neg act as round_up</li>
+     <li>round_half_up : If the discarded fraction is &gt;= 0.5, use round_up</li>
+     <li>round_half_down : If the discarded fraction is &gt;  0.5, use round_up</li>
+     <li>round_half_even : If remainder digit from discard (left digit to the discarded fraction) is even, act as round_half_up, otherwise use round_half_down</li>
+  </ul>
+  If no rounding_mode is provided during operations the default mode is round_half_up.</p>
+
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add-2">add/2</a></td><td>Equivalent to <a href="bigdec_arith.html#add-2"><tt>bigdec_arith:add(Number1, Number2)</tt></a>.
 </td></tr>
-<tr><td valign="top"><a href="#as_text-1">as_text/1</a></td><td>Convert bigdec representation as text.</td></tr>
+<tr><td valign="top"><a href="#as_text-1">as_text/1</a></td><td>Equivalent to <a href="bigdec_conv.html#as_text-1"><tt>bigdec_conv:as_text(Number)</tt></a>.
+</td></tr>
 <tr><td valign="top"><a href="#compare-2">compare/2</a></td><td>Equivalent to <a href="bigdec_comp.html#compare-2"><tt>bigdec_comp:compare(Number1, Number2)</tt></a>.
 </td></tr>
 <tr><td valign="top"><a href="#contains_integer-1">contains_integer/1</a></td><td>Equivalent to <a href="bigdec_comp.html#contains_integer-1"><tt>bigdec_comp:contains_integer(Number)</tt></a>.
@@ -99,10 +115,8 @@
 <h3 class="function"><a name="as_text-1">as_text/1</a></h3>
 <div class="spec">
 <p><tt>as_text(Number::<a href="#type-bigdec">bigdec()</a>) -&gt; Result::&lt;&lt;&gt;&gt;</tt><br></p>
-</div><p><p>Convert bigdec representation as text.</p>
- 
-  Using calculation of Value * (Sign * -1) * 10 ^ Exp return the format of a
-  bitstring representing the bigdec data.</p>
+</div><p>Equivalent to <a href="bigdec_conv.html#as_text-1"><tt>bigdec_conv:as_text(Number)</tt></a>.</p>
+
 
 <h3 class="function"><a name="compare-2">compare/2</a></h3>
 <div class="spec">
