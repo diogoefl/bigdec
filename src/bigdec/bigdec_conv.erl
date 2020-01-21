@@ -1,8 +1,5 @@
-%%%--------------------------------------------------------------------------------------------------------------------
-%%% BigDec Library Conversions
-%%%
-%%% @author diogoefl
-%%% @copyright (diogoefl) 2020. All Rights Reserved.
+%%%= LICENSE INFORMATION START ========================================================================================
+%%% BigDec Library
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
 %%% the License. You may obtain a copy of the License at
@@ -12,33 +9,32 @@
 %%% Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
 %%% an "AS IS" basis, without warranties or conditions of any kind, either express or implied. See the License for the
 %%% specific language governing permissions and limitations under the License.
-%%%
+%%%= LICENSE INFORMATION END===========================================================================================
+
+%%%--------------------------------------------------------------------------------------------------------------------
 %%% @doc Arbitrary Precision Decimal Conversions.
 %%%
 %%% Defines handlers for converting from and to bigdec.
+%%% @author diogoefl
+%%% @copyright (diogoefl) 2020. All Rights Reserved.
 %%% @end
-%%%
 %%%--------------------------------------------------------------------------------------------------------------------
-
 -module(bigdec_conv).
 %% @headerfile ["bigdec.hrl"]
 
 %%%====================================================================================================================
 %%% Data Structures
 %%%====================================================================================================================
-
 -include("bigdec.hrl").
 
 %%%====================================================================================================================
 %%% Module setup
 %%%====================================================================================================================
-
 -export([as_text/1]).
 
 %%%====================================================================================================================
 %%% EUnit setup
 %%%====================================================================================================================
-
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 -endif.
@@ -56,6 +52,8 @@
 %% parse(string | bitstring | float | integer, {options}) -> #bigdec{}
 %%=============================================================================
 
+%% @TODO parse(string() | bitstring() | float() | integer()) -> bigdec:bigdec().
+%% @TODO parse(string() | bitstring() | float() | integer(), {options}) -> bigdec:bigdec().
 
 %%=============================================================================
 %% Library public functions - Conversions from bigdec
@@ -68,6 +66,10 @@
 %% as_text(#bigdec{}, {options})  -> bitstring | string
 %%
 %%=============================================================================
+
+%% @TODO as_float(bigdec:bigdec()) -> float().
+%% @TODO as_float(bigdec:bigdec(), {options}) -> float().
+%% @TODO as_text(bigdec:bigdec(), {options}) -> bitstring() | string().
 
 %%---------------------------------------------------------------------------------------------------------------------
 %% @doc Convert bigdec representation as text.
@@ -94,7 +96,6 @@ as_text(Num = #bigdec{}) ->
 %%%====================================================================================================================
 %%% EUnit Tests
 %%%====================================================================================================================
-
 -ifdef(TEST).
 
 as_text_test() ->

@@ -62,6 +62,9 @@
 %%%                    round_half_up, otherwise use round_half_down
 %%%====================================================================================================================
 
+%% @TODO pow(bigdec:bigdec(), integer()) -> bigdec:bigdec().
+%% @TODO rem(bigdec:bigdec(), bigdec:bigdec()) -> bigdec:bigdec().
+
 %%---------------------------------------------------------------------------------------------------------------------
 %% @doc Add two bigdec numbers by matching scale if necessary.
 %%

@@ -11,27 +11,14 @@
 
 <h1>Module bigdec_common</h1>
 <ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Arbitrary Precision Decimal Common utility functions and helpers.
-<p>Copyright © (diogoefl) 2020. All Rights Reserved.
-  
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-  
-       http://www.apache.org/licenses/LICENSE-2.0
-  
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" basis,
-   without warranties or conditions of any kind, either express or
-   implied. See the License for the specific language governing permissions
-   and limitations under the License.
-  `</p>
+<p>Copyright © (diogoefl) 2020. All Rights Reserved.</p>
 
 <p><b>Authors:</b> diogoefl.</p>
 
 <h2><a name="description">Description</a></h2><p>Arbitrary Precision Decimal Common utility functions and helpers.</p>
   
-   Defines common utility functions and helpers to be used internally on the
-   library. These functions are not supposed to be used outside of bidec app.
+   Defines common utility functions and helpers to be used internally on the library. These functions are not supposed
+   to be used outside of bigdec app.
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#hlp_apply_round-4">hlp_apply_round/4</a></td><td>Applies rounding mode to digit according to next truncated digit and rounding method.</td></tr>
 <tr><td valign="top"><a href="#hlp_int_division-2">hlp_int_division/2</a></td><td>Divide 2 integers and return also remainder of division.</td></tr>
@@ -50,11 +37,14 @@
   <ul>
   <li>round_up        =&gt; Increments the digit prior to a nonzero discarded fraction</li>
   <li>round_down      =&gt; Doesn't increment the digit prior to a discarded fraction (trunc)</li>
-  <li>round_ceiling   =&gt; Round towards positive infinity - if sign is pos act as round_up, if is neg act as round_down</li>
-  <li>round_floor     =&gt; Round towards negative infinity - if sign is pos act as round_down, it is neg act as round_up</li>
+  <li>round_ceiling   =&gt; Round towards positive infinity - if sign is pos act as round_up, if is neg act as
+  round_down</li>
+  <li>round_floor     =&gt; Round towards negative infinity - if sign is pos act as round_down, it is neg act as
+  round_up</li>
   <li>round_half_up   =&gt; If the discarded fraction is &gt;= 0.5, use round_up</li>
   <li>round_half_down =&gt; If the discarded fraction is &gt;  0.5, use round_up</li>
-  <li>round_half_even =&gt; If remainder digit from discard (left digit to the discarded fraction) is even, act as round_half_up, otherwise use round_half_down</li>
+  <li>round_half_even =&gt; If remainder digit from discard (left digit to the discarded fraction) is even, act as
+  round_half_up, otherwise use round_half_down</li>
   </ul></p>
 
 <h3 class="function"><a name="hlp_int_division-2">hlp_int_division/2</a></h3>
@@ -69,17 +59,16 @@
 <p><tt>hlp_pow(Number::integer(), Exponent::non_neg_integer()) -&gt; Result::integer()</tt><br></p>
 </div><p><p>Calculates exponentiation by squaring with big integers.</p>
  
-  Execute exponentiation of numbers, using recursive call of erlang pure ints,
-  but it does not do fractional exponent, or count for negative exponent. At
-  these cases it returns error.</p>
+  Execute exponentiation of numbers, using recursive call of erlang pure ints, but it does not do fractional exponent,
+  or count for negative exponent. At these cases it returns error.</p>
 
 <h3 class="function"><a name="hlp_prepend_zeros-2">hlp_prepend_zeros/2</a></h3>
 <div class="spec">
 <p><tt>hlp_prepend_zeros(NumberString::string(), LeadingZeros::integer()) -&gt; ResultString::string()</tt><br></p>
 </div><p><p>Generates string containing leading zeros for formatting.</p>
  
-  Based on amount of required leading zeros generates string prepending zeros
-  to original string and returns the new string.</p>
+  Based on amount of required leading zeros generates string prepending zeros to original string and returns the new
+  string.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>

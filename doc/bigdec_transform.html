@@ -11,20 +11,7 @@
 
 <h1>Module bigdec_transform</h1>
 <ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Arbitrary Precision Decimal Transform functions.
-<p>Copyright © (diogoefl) 2020. All Rights Reserved.
-  
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-  
-       http://www.apache.org/licenses/LICENSE-2.0
-  
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" basis,
-   without warranties or conditions of any kind, either express or
-   implied. See the License for the specific language governing permissions
-   and limitations under the License.
-  `</p>
+<p>Copyright © (diogoefl) 2020. All Rights Reserved.</p>
 
 <p><b>Authors:</b> diogoefl.</p>
 
@@ -43,17 +30,16 @@
 <p><tt>neg(Number::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>) -&gt; Result::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a></tt><br></p>
 </div><p><p>Negate bigdec changing its sign from 0 to 1 or vice-versa.</p>
  
-  If sign defined in bigdec is invalid (different from 0 or 1), we return a
-  correction bigdec defining sign as 0 (positive of zero).</p>
+  If sign defined in bigdec is invalid (different from 0 or 1), we return a correction bigdec defining sign as 0
+  (positive of zero).</p>
 
 <h3 class="function"><a name="strip_zeros-1">strip_zeros/1</a></h3>
 <div class="spec">
 <p><tt>strip_zeros(Number::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a>) -&gt; Result::<a href="bigdec.html#type-bigdec">bigdec:bigdec()</a></tt><br></p>
 </div><p><p>Strip possible trailing zeros in bigdec number.</p>
  
-  If there is any trailing zero, returns a new bigdec with stripped zeros from
-  the right side ov value and adjusted exp value. If no trailing zeros are
-  found in bigdec, the same bigdec is returned.</p>
+  If there is any trailing zero, returns a new bigdec with stripped zeros from the right side ov value and adjusted
+  exp value. If no trailing zeros are found in bigdec, the same bigdec is returned.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>

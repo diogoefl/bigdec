@@ -48,11 +48,14 @@
 %% <ul>
 %%    <li>round_up : Increments the digit prior to a nonzero discarded fraction</li>
 %%    <li>round_down : Doesn't increment the digit prior to a discarded fraction (trunc)</li>
-%%    <li>round_ceiling : Round towards positive infinity - if sign is pos act as round_up, if is neg act as round_down</li>
-%%    <li>round_floor : Round towards negative infinity - if sign is pos act as round_down, it is neg act as round_up</li>
+%%    <li>round_ceiling : Round towards positive infinity - if sign is pos act as round_up, if is neg act as
+%% round_down</li>
+%%    <li>round_floor : Round towards negative infinity - if sign is pos act as round_down, it is neg act as
+%% round_up</li>
 %%    <li>round_half_up : If the discarded fraction is >= 0.5, use round_up</li>
 %%    <li>round_half_down : If the discarded fraction is >  0.5, use round_up</li>
-%%    <li>round_half_even : If remainder digit from discard (left digit to the discarded fraction) is even, act as round_half_up, otherwise use round_half_down</li>
+%%    <li>round_half_even : If remainder digit from discard (left digit to the discarded fraction) is even, act as
+%% round_half_up, otherwise use round_half_down</li>
 %% </ul>
 %% If no rounding_mode is provided during operations the default mode is round_half_up.
 
